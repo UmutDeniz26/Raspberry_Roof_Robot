@@ -1,0 +1,19 @@
+import serial
+import pynmea2
+
+def read_gps_data(serial_port):
+    with serial.Serial(serial_port, baudrate=9600, timeout=1) as ser:
+        while True:
+            line = ser.readline().decode('utf-8')
+            if line.startswith('$GPGGA'):
+                try:
+                    msg = pynmea2.parse(line)
+                    latitude = msg.latitude
+                    longitude = msg.longitude
+                    print("Latitude: {}, Longitude: {}".format(latitude, longitude))
+                except pynmea2.ParseError:
+                    print("Parse error: ", line)
+
+if __name__ == "__main__":
+    serial_port = '/dev/ttyS0'  # Serial port where GPS module is connected
+    read_gps_data(serial_port)
