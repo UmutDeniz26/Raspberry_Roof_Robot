@@ -59,5 +59,7 @@ picam2 = Picamera2()
 picam2.vflip = True
 #take_picture_and_save(picam2)
 record_video_and_save(picam2)
+save_file = os.path.join(os.getcwd(), os.path.join(os.path.dirname(__file__), "output/test.h264"))
+convert_h264_to_mp4(save_file, save_file.replace(".h264", ".mp4"))
 #test(picam2)
 
