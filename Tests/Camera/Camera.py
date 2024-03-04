@@ -24,6 +24,27 @@ def record_video_and_save(camera, save_file = None, duration = 5):
     print("Start recording")
     camera.start_and_record_video(output=save_file, duration=duration, show_preview=True)
     print("Recording finished and saved to ", save_file)
+import subprocess
+
+def convert_h264_to_mp4(h264_file, mp4_file):
+    if not os.path.exists(h264_file):
+        raise FileNotFoundError("File not found")
+    if not h264_file.endswith(".h264"):
+        raise ValueError("Input file must be a h264 file")
+    if not mp4_file.endswith(".mp4"):
+        raise ValueError("Output file must be a mp4 file")
+    if os.path.exists(mp4_file):
+        os.remove(mp4_file)
+    
+    # Conversion command using ffmpeg
+    command = ["ffmpeg", "-i", h264_file, "-c:v", "copy", "-c:a", "aac", mp4_file]
+    # Execute the command
+    try:
+        subprocess.run(command, check=True)
+        print("Conversion successful!")
+    except subprocess.CalledProcessError as e:
+        print("Error during conversion:", e)
+
 
 def test(picam2):
     camera_config = picam2.create_preview_configuration()
