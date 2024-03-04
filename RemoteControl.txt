@@ -1,0 +1,3 @@
+sudo apt-get install xrdp
+sudo service xrdp start | stop | restart | status
+

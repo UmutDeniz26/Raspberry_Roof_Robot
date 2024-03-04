@@ -5,8 +5,8 @@ import os
 import time
 # ... rest of the script ...
 
-print("User: ", os.getlogin())
-print("Permissions: ", oct(os.stat('/dev/ttyS0').st_mode))
+#print("User: ", os.getlogin())
+#print("Permissions: ", oct(os.stat('/dev/ttyS0').st_mode))
 
 def read_gps_data(serial_port):
         # Check if the user has permission to access the serial port
