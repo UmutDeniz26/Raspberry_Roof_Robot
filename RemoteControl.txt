@@ -1,3 +1,5 @@
 sudo apt-get install xrdp
 sudo service xrdp start | stop | restart | status
 
+//To see host IP
+hostname -I
