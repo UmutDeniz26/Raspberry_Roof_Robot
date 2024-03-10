@@ -1,4 +1,17 @@
-Write these commands to start stream 
+Write this command to start stream 
+picam-vid -n -t 0 --inline -o - | cvlc stream:///dev/stdin --sout '#rtp{sdp=rtsp://:8080/stream1}' :demux=h264
 
-cd Desktop/Raspberry_Roof_Robot
-sh start_stream.sh
+
+To get stream
+
+1 - Open VLC Media Player: Launch VLC Media Player on your Windows computer.
+
+2 - Open Network Stream: Go to the "Media" menu at the top left corner of the VLC window,
+    then select "Open Network Stream...".
+
+3 - Enter Stream URL: In the "Open Media" dialog box, 
+    enter the URL of your Raspberry Pi camera stream. 
+    In form of `rtsp://192.168.1.13:8080/stream1`
+    (To get the Ip adress, write hostname -I to terminal)
+
+4 - Play Stream
