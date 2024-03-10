@@ -1,0 +1,7 @@
+Use -n paramater every time if you use the rasp on remote control.
+
+This will throw an error:
+rpicam-jpeg -o test.jpg -t 2000 --width 640 --height 480
+
+It will not:
+rpicam-jpeg -o test.jpg -t 2000 --width 640 --height 480 -n

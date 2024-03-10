@@ -1,0 +1,4 @@
+Write these commands to start stream 
+
+cd Desktop/Raspberry_Roof_Robot
+sh start_stream.sh
