@@ -1,5 +1,6 @@
 Write this command to start stream 
-picam-vid -n -t 0 --inline -o - | cvlc stream:///dev/stdin --sout '#rtp{sdp=rtsp://:8080/stream1}' :demux=h264
+rpicam-vid - -n -t 0 --inline -o - | cvlc stream:///dev/stdin --sout '#rtp{sdp=rtsp://:8080/stream1}' :demux=h264
+
 
 
 To get stream
