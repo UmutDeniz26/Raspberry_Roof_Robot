@@ -56,6 +56,7 @@ int status;
 /* Private function prototypes -----------------------------------------------*/
 void RangingLoop(const char *output_file_path); /*  */
 void ClearTxtFile(const char *output_file_path); /*  */
+int kbhit(void); /*  */
 /* USER CODE END PFP */
 
 int main(void)
@@ -144,6 +145,37 @@ int main(void)
   return 0;
   
 }
+
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+int kbhit(void) {
+    struct termios oldt, newt;
+    int ch;
+    int oldf;
+
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+    ch = getchar();
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    fcntl(STDIN_FILENO, F_SETFL, oldf);
+
+    if(ch != EOF) {
+        ungetc(ch, stdin);
+        return 1;
+    }
+
+    return 0;
+}
+
 void ClearTxtFile(const char *output_file_path)
 {
   FILE *output_file;
@@ -152,7 +184,7 @@ void ClearTxtFile(const char *output_file_path)
     printf("Error opening file!\n");
     return;
   }
-  fprintf(output_file, "Old data cleared\n");
+  fprintf(output_file, "{\"initial_entry\": \"Clearing the old file\"}\n");
   fclose(output_file); // Close the file when done
 }
 
@@ -171,7 +203,8 @@ void RangingLoop(const char *output_file_path)
   VL53LX_MultiRangingData_t *pMultiRangingData = &MultiRangingData;
   uint8_t NewDataReady=0;
   int no_of_object_found=0,j;
-  fprintf(output_file, "Ranging loop starts\n");
+  char *json_string;
+  fprintf(output_file, "{\"initial_entry\": \"Ranging loop starts\"}\n");
   printf("Ranging loop starts\n");
   
   status = VL53LX_WaitDeviceBooted(Dev);
@@ -179,29 +212,39 @@ void RangingLoop(const char *output_file_path)
   status = VL53LX_StartMeasurement(Dev);
   
   if(status){
-    fprintf(output_file, "VL53LX_StartMeasurement failed: error = %d \n", status);
+    fprintf(output_file, "{\"Error\": \"VL53LX_StartMeasurement failed\", \"status\": \" %d \"}\n", status);
     printf("VL53LX_StartMeasurement failed: error = %d \n", status);
     while(1);
   }
   
-  do{ // polling mode
+  int exit_flag = 0;
+  while (!exit_flag) {
+    if (kbhit()) {
+        char c = getchar();
+        if (c == 'e') {
+            exit_flag = 1;
+            printf("Exiting...\n");
+        }
+    }
+  
     status = VL53LX_GetMeasurementDataReady(Dev, &NewDataReady);                        
-    usleep(250000); // 250 millisecond polling period, could be 1 millisecond.
+    usleep(1000000); // 1000 millisecond polling period, could be 1 millisecond.
     if((!status)&&(NewDataReady!=0)){
       status = VL53LX_GetMultiRangingData(Dev, pMultiRangingData);
       no_of_object_found=pMultiRangingData->NumberOfObjectsFound;
-      fprintf(output_file, "Count=%5d, ", pMultiRangingData->StreamCount);
-      fprintf(output_file, "#Objs=%1d ", no_of_object_found);
-      for(j=0;j<no_of_object_found;j++){
-        if(j!=0)fprintf(output_file, "\n                     ");
-        fprintf(output_file, "status=%d, D=%5dmm, S=%7dmm, Signal=%2.2f Mcps, Ambient=%2.2f Mcps",
-               pMultiRangingData->RangeData[j].RangeStatus,
-               pMultiRangingData->RangeData[j].RangeMilliMeter,
-               pMultiRangingData->RangeData[j].SigmaMilliMeter,
-               pMultiRangingData->RangeData[j].SignalRateRtnMegaCps/65536.0,
-               pMultiRangingData->RangeData[j].AmbientRateRtnMegaCps/65536.0);
+      fprintf(output_file, "{\"Count\": %d, \"#Objs\": %d, \"Objects\": [", pMultiRangingData->StreamCount, no_of_object_found);
+      for(j = 0; j < no_of_object_found; j++){
+          if(j != 0) fprintf(output_file, ",\n                     ");
+
+          fprintf(output_file, "{\"status\": %d, \"D\": %d, \"S\": %d, \"Signal\": %.2f, \"Ambient\": %.2f}",
+                pMultiRangingData->RangeData[j].RangeStatus,
+                pMultiRangingData->RangeData[j].RangeMilliMeter,
+                pMultiRangingData->RangeData[j].SigmaMilliMeter,
+                pMultiRangingData->RangeData[j].SignalRateRtnMegaCps / 65536.0,
+                pMultiRangingData->RangeData[j].AmbientRateRtnMegaCps / 65536.0);
       }
-      fprintf(output_file, "\n");
+
+      fprintf(output_file, "]}\n");
       fflush(output_file); // Flush the file buffer to ensure data is written to file immediately
 
       if (status==0){
@@ -209,7 +252,6 @@ void RangingLoop(const char *output_file_path)
       }
     }
   }
-  while (1);
 
   fclose(output_file); // Close the file when done
 }
