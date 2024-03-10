@@ -54,7 +54,8 @@ int status;
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-void RangingLoop(void); /*  */
+void RangingLoop(const char *output_file_path); /*  */
+void ClearTxtFile(const char *output_file_path); /*  */
 /* USER CODE END PFP */
 
 int main(void)
@@ -119,7 +120,11 @@ int main(void)
   }
   VL53LX_RdWord(Dev, 0x010F, &wordData);
   printf("VL53LX: %02X\n\r", wordData);
-  RangingLoop();
+
+  const char *output_file_path = "vl53l3cx_ranging_output.txt";
+  ClearTxtFile(output_file_path);
+  printf("Txt file cleared\n");
+  RangingLoop(output_file_path);
   
   /* USER CODE END 2 */
   
@@ -139,16 +144,34 @@ int main(void)
   return 0;
   
 }
-
-/* USER CODE BEGIN 4 */
-
-/* ranging and display loop */
-void RangingLoop(void)
+void ClearTxtFile(const char *output_file_path)
 {
+  FILE *output_file;
+  output_file = fopen(output_file_path, "w"); // Open file for writing
+  if (output_file == NULL) {
+    printf("Error opening file!\n");
+    return;
+  }
+  fprintf(output_file, "Old data cleared\n");
+  fclose(output_file); // Close the file when done
+}
+
+/* USER CODE BEGIN 4 *//* ranging and display loop */
+void RangingLoop(const char *output_file_path)
+{
+  FILE *output_file;
+  output_file = fopen(output_file_path, "a"); // Open file for writing
+  
+  if (output_file == NULL) {
+    printf("Error opening file!\n");
+    return;
+  }
+  
   VL53LX_MultiRangingData_t MultiRangingData;
   VL53LX_MultiRangingData_t *pMultiRangingData = &MultiRangingData;
   uint8_t NewDataReady=0;
   int no_of_object_found=0,j;
+  fprintf(output_file, "Ranging loop starts\n");
   printf("Ranging loop starts\n");
   
   status = VL53LX_WaitDeviceBooted(Dev);
@@ -156,13 +179,10 @@ void RangingLoop(void)
   status = VL53LX_StartMeasurement(Dev);
   
   if(status){
+    fprintf(output_file, "VL53LX_StartMeasurement failed: error = %d \n", status);
     printf("VL53LX_StartMeasurement failed: error = %d \n", status);
     while(1);
   }
-  int hold_stream_count = pMultiRangingData->StreamCount; 
-  double total_distance = 0;
-  int measure_count = 0;
-  int MEASURE_LIMIT = 30;
   
   do{ // polling mode
     status = VL53LX_GetMeasurementDataReady(Dev, &NewDataReady);                        
@@ -170,35 +190,30 @@ void RangingLoop(void)
     if((!status)&&(NewDataReady!=0)){
       status = VL53LX_GetMultiRangingData(Dev, pMultiRangingData);
       no_of_object_found=pMultiRangingData->NumberOfObjectsFound;
-      printf("Count=%5d, ", pMultiRangingData->StreamCount);
-      printf("#Objs=%1d ", no_of_object_found);
+      fprintf(output_file, "Count=%5d, ", pMultiRangingData->StreamCount);
+      fprintf(output_file, "#Objs=%1d ", no_of_object_found);
       for(j=0;j<no_of_object_found;j++){
-        if(j!=0)printf("\n                     ");
-        printf("status=%d, D=%5dmm, S=%7dmm, Signal=%2.2f Mcps, Ambient=%2.2f Mcps",
+        if(j!=0)fprintf(output_file, "\n                     ");
+        fprintf(output_file, "status=%d, D=%5dmm, S=%7dmm, Signal=%2.2f Mcps, Ambient=%2.2f Mcps",
                pMultiRangingData->RangeData[j].RangeStatus,
                pMultiRangingData->RangeData[j].RangeMilliMeter,
                pMultiRangingData->RangeData[j].SigmaMilliMeter,
                pMultiRangingData->RangeData[j].SignalRateRtnMegaCps/65536.0,
                pMultiRangingData->RangeData[j].AmbientRateRtnMegaCps/65536.0);
       }
-      if (no_of_object_found != 0){
-        total_distance += pMultiRangingData->RangeData[0].RangeMilliMeter;
-        measure_count++;
-      }
-      printf ("\n");
-      if (measure_count > MEASURE_LIMIT) {
-        printf("Average distance over last %d measurements: %f\n",measure_count, total_distance / measure_count*1.0);
-        printf("Total measurements / count : %lf/%d\n", total_distance, measure_count);
-        printf("Total measurements: %d\n", measure_count);
-        break;
-      }
+      fprintf(output_file, "\n");
+      fflush(output_file); // Flush the file buffer to ensure data is written to file immediately
+
       if (status==0){
         status = VL53LX_ClearInterruptAndStartMeasurement(Dev);
       }
     }
   }
   while (1);
+
+  fclose(output_file); // Close the file when done
 }
+
 
 /* USER CODE END 4 */
 

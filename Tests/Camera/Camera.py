@@ -20,4 +20,5 @@ def record_video_and_save(camera, save_file = None, duration = 5):
 picam2 = Picamera2()
 picam2.vflip = True
 take_picture_and_save(picam2)
+
 #record_video_and_save(picam2)
