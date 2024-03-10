@@ -1,1 +1,12 @@
 Tests/Camera/output/
+Tests/Distance_Sensor/VL53L3CX_rasppi/doc
+Tests/Distance_Sensor/VL53L3CX_rasppi/bin
+Tests/Distance_Sensor/VL53L3CX_rasppi/core
+Tests/Distance_Sensor/VL53L3CX_rasppi/obj
+Tests/Distance_Sensor/VL53L3CX_rasppi/platform
+
+Tests/Distance_Sensor/VL53L3CX_rasppi/.gitignore
+Tests/Distance_Sensor/VL53L3CX_rasppi/.gitattributes
+Tests/Distance_Sensor/VL53L3CX_rasppi/LICENSE.md
+Tests/Distance_Sensor/VL53L3CX_rasppi/Readme.md
+Tests/Distance_Sensor/VL53L3CX_rasppi/Makefile
