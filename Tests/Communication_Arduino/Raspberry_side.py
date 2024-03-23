@@ -1,38 +1,42 @@
-#!/usr/bin/env python3
 import serial
 import time
 
-def transmit_receive_arduino_message( message, wait_delay = 0 ):
+def transmit_receive_arduino_message(message: str, timeout_limit: int):
+    """
+        Transmit a message to the Arduino and wait for a response.
 
-    ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)  # Open serial port
-    ser.flushInput()  # To clear the input buffer
-    
-    #ser.write(b"{}\n".format(message).encode('utf-8'))  # Send message to Arduino
-    ser.write(message.encode('utf-8'))  
+        Args:
+            message (str): The message to send to the Arduino.
+            timeout_limit (int): The time to wait for a response from the Arduino. *Note: The timeout is in seconds.
 
-    # Wait for the Arduino to process the message
-    if wait_delay > 0:
-        hold_time = time.time()
-        # if wait_delay is 1000 then it will wait for 1 second
-        while time.time() - hold_time < wait_delay:
-            line = ser.readline().decode('utf-8').rstrip()
-            if line:
-                print("Message taken while waiting.")
-                break
-    
-    if not line:
+        Returns:
+            str: The response from the Arduino. *Note: In form of json string.
+    """
+
+    ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+    ser.reset_input_buffer()
+    hold = time.time()
+
+    if "\n" not in message:
+        return "{'error': 'Message must end with a newline character.'}"
+
+    while True:
+        
+        ser.write(message.encode())
         line = ser.readline().decode('utf-8').rstrip()
-        print("Message taken after waiting.")
-
-    if line:
-        recieved = line
-    else:
-        recieved = {"error": "No response from Arduino"}
-    
-    ser.close()
-
-    return recieved
+        if line:
+            return line
+        
+        if time.time() - hold > timeout_limit:
+            return "{'error': 'Timeout limit reached.'}"
+        
+        time.sleep(0.1)
 
 
-if __name__ == '__main__':
-    print("Use main function to send message to Arduino")
+# Test the function
+def test():
+    response = transmit_receive_arduino_message("Hello Arduino! \n", 10)
+    print("Response from Arduino:", response)
+
+if __name__ == "__main__":
+    test()
