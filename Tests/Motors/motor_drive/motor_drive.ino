@@ -16,7 +16,7 @@ unsigned long motorInterval = 6000; // Interval for motor movements
 unsigned long previousTimeMPU = 0;
 unsigned long mpuInterval = 5000000; // Interval for MPU6050 readings
 
-unsigned long stopInterval = 1000; // Interval to stop between movements
+unsigned long stopInterval = 100; // Interval to stop between movements
 
 
 // Function prototypes
@@ -40,11 +40,13 @@ void setup() {
   // Try to initialize!
   if (!mpu.begin()) {
     Serial.println("Failed to find MPU6050 chip");
-    while (1) {
-      delay(10);
-    }
+    //while (1) {
+    //  delay(10);
+    //}
   }
-  Serial.println("MPU6050 Found!");
+  else{
+    Serial.println("MPU6050 Found!");
+  }
 }
 
 int movment_counter = 0;
@@ -56,23 +58,21 @@ void loop() {
   if (currentTime - previousTimeMotor >= motorInterval) {
     forward(255); // Perform motor movement
 
-    movment_counter = (movment_counter+1)%3;
+    movment_counter = (movment_counter+1)%2;
+
     switch(movment_counter){
       case 0:
-        forward(255);
+        left(255);
         break;
       case 1:
         right(255);
         break;
-      case 2:
-        backward(255);
-        break;
     }
 
     previousTimeMotor = currentTime;
-  } else if (currentTime - previousTimeMotor >= motorInterval - stopInterval) {
-    stop(); // Stop the motors after motorInterval - stopInterval
-  }
+  } //else if (currentTime - previousTimeMotor >= motorInterval - stopInterval) {
+    //stop(); // Stop the motors after motorInterval - stopInterval
+  //}
   
   // Check for MPU6050 readings
   if (currentTime - previousTimeMPU >= mpuInterval) {
