@@ -7,8 +7,9 @@ void loop() {
     // Read the incoming data *Note: Our stop character is '\n'
     String data = Serial.readStringUntil('\n');
 
-    // Verify that the data was received
+    // Verify that the data was received    
     Serial.print("You sent me: ");
     Serial.println(data);
   }
 }
+

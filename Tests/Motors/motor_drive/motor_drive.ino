@@ -1,4 +1,7 @@
 #include <Adafruit_MPU6050.h>
+#include <ArduinoJson.h>
+#include <SoftwareSerial.h>
+
 
 //MOTOR1 PINS
 int ena = 5;
@@ -15,8 +18,12 @@ unsigned long motorInterval = 6000; // Interval for motor movements
 
 unsigned long previousTimeMPU = 0;
 unsigned long mpuInterval = 5000000; // Interval for MPU6050 readings
-
 unsigned long stopInterval = 100; // Interval to stop between movements
+
+
+int RXPin = 2;
+int TXPin = 3;
+SoftwareSerial gpsSerial(RXPin, TXPin);
 
 
 // Function prototypes
@@ -35,42 +42,88 @@ void setup() {
   pinMode(in3, OUTPUT);
   pinMode(in4, OUTPUT);
 
+  gpsSerial.begin(9600);
+
   Serial.begin(115200);
 
-  // Try to initialize!
-  if (!mpu.begin()) {
-    Serial.println("Failed to find MPU6050 chip");
-    //while (1) {
-    //  delay(10);
-    //}
-  }
-  else{
-    Serial.println("MPU6050 Found!");
-  }
 }
 
 int movment_counter = 0;
+String GPS_data = "";
+
+String return_inputs = "";
+String return_outputs = "";
+String return_data = "";
+String data = "";
+
+unsigned long currentTime = 0;
 
 void loop() {
-  unsigned long currentTime = millis();
+  currentTime = millis();
+
+  if (Serial.available() > 0) {
+    // Read the incoming data *Note: Our stop character is '\n'
+    data = Serial.readStringUntil('\n');
+
+    // Parse the JSON data
+    DynamicJsonDocument doc(1024); // Adjust the size as needed
+    DeserializationError error = deserializeJson(doc, data);
+
+    // Verify that the data was received and parsed successfully
+    if (!error) {
+      // Access JSON data here
+      String type = doc["Type"];
+      String command = doc["Command"];
+
+      return_inputs = "{\"Inputs\": [{\"Type\": \"robot_move\", \"Command\": \"forward\"}] }";
+      return_outputs = "{\"Outputs\": [ ] }";
+      
+      // Perform action based on JSON data
+      if(type == "robot_move" && command == "forward") {
+        Serial.print("Forward---");
+        forward(255);
+      }else if (type == "robot_move" && command == "backward") {
+        backward(255);
+      }else if (type == "robot_move" && command == "left") {
+        left(255);
+      }else if (type == "robot_move" && command == "right") {
+        right(255);
+      }else if (type == "robot_move" && command == "stop") {
+        stop();
+      }
+      else if (type == "gps") {
+        //By using gpsSerial.read(), generate GPS_data var
+        GPS_data = gpsSerial.read();
+        return_outputs = "{\"Outputs\": [{\"Type\": \"gps\", \"Data\": \"" + GPS_data + "\"}] }";
+      }
+
+      return_data = return_inputs + return_outputs;
+
+      Serial.println(return_data);
+
+    } else {
+      Serial.println("Failed to parse JSON");
+    }
+  }
 
   // Check for motor movements
+  /*
   if (currentTime - previousTimeMotor >= motorInterval) {
-    forward(255); // Perform motor movement
-
     movment_counter = (movment_counter+1)%2;
 
     switch(movment_counter){
       case 0:
-        left(255);
+        forward(255);
         break;
       case 1:
-        right(255);
+        forward_left(255);
         break;
     }
 
     previousTimeMotor = currentTime;
-  } //else if (currentTime - previousTimeMotor >= motorInterval - stopInterval) {
+  }
+  */
+    //else if (currentTime - previousTimeMotor >= motorInterval - stopInterval) {
     //stop(); // Stop the motors after motorInterval - stopInterval
   //}
   
@@ -80,6 +133,7 @@ void loop() {
     mpu.getEvent(&a, &g, &temp);
   
     /* Print out the values */
+    /*
     Serial.print("Acceleration X: ");
     Serial.print(a.acceleration.x);
     Serial.print(", Y: ");
@@ -100,9 +154,23 @@ void loop() {
     Serial.print(temp.temperature);
     Serial.println(" degC");
     Serial.println("");
+    */
     previousTimeMPU = currentTime;
-  
   }
+}
+
+void forward_left(int speed) {
+  
+  //MOTOR_A COUNTERCLOCKWISE MAX SPEED
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  analogWrite(ena, 180);
+
+  //MOTOR_B CLOCKWISE MAX SPEED
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
+  analogWrite(enb, 255);
+
 }
 
 void stop() {
