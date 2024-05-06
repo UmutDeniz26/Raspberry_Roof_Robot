@@ -66,6 +66,9 @@ void setup() {
 int movment_counter = 0;
 String GPS_data = "";
 String data = "";
+String return_inputs = "";
+String return_outputs = "";
+String return_data = "";
 
 unsigned long currentTime = 0;
 
@@ -82,22 +85,32 @@ void loop() {
     DynamicJsonDocument doc(1024); // Adjust the size as needed
     DeserializationError error = deserializeJson(doc, data);
 
+    
+    
+
     // Verify that the data was received and parsed successfully
     if (!error) {
       // Access JSON data here
       String type = doc["Type"];
       String command = doc["Command"];
-      
+      return_inputs = "\"Inputs\": [ {\"Type\": \"" + type + "\", \"Command\": \"" + command + "\"} ]";
+      return_outputs = "\"Outputs\": [ ] ";
+
       if (type == "robot_move"){
         motor_controller(command, 255);
       }
       else if(type=="gps"){
         GPS_data = readGPSData();
-        Serial.println(GPS_data);
+        return_outputs = "\"Outputs\": [{\"Type\": \"gps\", \"Data\": \"" + GPS_data + "\"}]";
+        //Serial.print(GPS_data);
       }
       
+
+      return_data = "{" + return_inputs + ", " + return_outputs + "}";
+      Serial.println(return_data);
+
       //Serial.write(0);
-      Serial.println("0");
+      //Serial.println("0");
       //Serial.write('\n');
 
     } else {
@@ -112,7 +125,6 @@ void loop() {
     MPUData data = getMPUData();
     printMPUData(data);
     Serial.println("0");
-
     previousTimeMPU = currentTime;
   }
 }
