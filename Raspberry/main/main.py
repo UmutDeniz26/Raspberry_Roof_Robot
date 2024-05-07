@@ -1,34 +1,38 @@
 import socket
-import time
+import json
 
-# Sample function for reading data from the sensor
-def read_distance_sensor():
-    # In a real application, data would be read from the sensor here
-    # For example: return some_sensor_library.read_distance()
-    return "5 meters"
+import sys
+sys.path.insert(1, 'Tests/Communication_Arduino')
+import Raspberry_side as rasp
 
-# Getting the host IP dynamically
-host = socket.gethostbyname(socket.gethostname())
-port = 5000
+HOST = socket.gethostbyname(socket.gethostname())
+PORT = 5000     
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((host, port))
-    s.listen()
+    s.bind((HOST, PORT))  
+    s.listen()            
+    print(f"Server is listening on {HOST}:{PORT}...")
 
-    print(f"Server is listening on {host}:{port}")
+    while True:
+        conn, addr = s.accept()  
+        with conn:
+            print(f"Connected from {addr}")
+            
+            message = "this is a gps data"
+            conn.sendall(message.encode('utf-8'))
+            
+            while True:
+                data = conn.recv(1024) 
+                if not data:
+                    break
+                
+                data_string = data.decode('utf-8')
 
-    conn, addr = s.accept()
-    with conn:
-        print(f"Connected to {addr}")
-        while True:
-            try:
-                # Read distance data from the sensor
-                # distance = read_distance_sensor()
-                # Send the data
-                conn.sendall(f"Distance: {5}\n".encode('utf-8'))
-                # Send updates every second
-                time.sleep(1)
-            except BrokenPipeError:
-                # If the client disconnects, break the loop
-                print("Client disconnected.")
-                break
+                # Encode as JSON
+                json_data = json.loads(data_string)
+
+                response_ard = rasp.transmit_receive_arduino_message(json_data, 5)
+                print(f"Data received from Arduino: {response_ard}")
+                print(f"Received data: {data}")
+
+                conn.sendall(data)
