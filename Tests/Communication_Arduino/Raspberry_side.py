@@ -1,19 +1,20 @@
 import serial
 import time
 
-def transmit_receive_arduino_message(message: str, timeout_limit: int):
+def transmit_receive_arduino_message(message_dict: dict, timeout_limit: int):
     """
         Transmit a message to the Arduino and wait for a response.
 
         Args:
-            message (str): The message to send to the Arduino.
+            message_dict (dict): The message to send to the Arduino.
             timeout_limit (int): The time to wait for a response from the Arduino. *Note: The timeout is in seconds.
 
         Returns:
             str: The response from the Arduino. *Note: In form of json string.
     """
+    message = json_dict_to_string(message_dict)
 
-    ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
     ser.reset_input_buffer()
     hold = time.time()
 
