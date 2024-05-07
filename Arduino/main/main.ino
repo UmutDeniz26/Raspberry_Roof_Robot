@@ -3,13 +3,13 @@
 #include <SoftwareSerial.h>
 
 //MOTOR Driver PINS
-int ena = 4; // Motor A
-int in1 = 6; // Controls direction of Motor A
-int in2 = 7; // Controls direction of Motor A
+const int ena = 4; // Motor A
+const int in1 = 6; // Controls direction of Motor A
+const int in2 = 7; // Controls direction of Motor A
 
-int enb = 10; // Motor B
-int in3 = 8; // Controls direction of Motor B
-int in4 = 9; // Controls direction of Motor B
+const int enb = 10; // Motor B
+const int in3 = 8; // Controls direction of Motor B
+const int in4 = 9; // Controls direction of Motor B
 
 //Adafruit_MPU6050 mpu;
 
@@ -143,7 +143,6 @@ void motor_controller(String command, int speed){
     stop();
   }
 }
-
 
 void stop() {
   //STOP
