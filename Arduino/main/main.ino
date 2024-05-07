@@ -3,7 +3,7 @@
 #include <SoftwareSerial.h>
 
 //MOTOR Driver PINS
-int ena = 5; // Motor A
+int ena = 4; // Motor A
 int in1 = 6; // Controls direction of Motor A
 int in2 = 7; // Controls direction of Motor A
 
@@ -14,7 +14,7 @@ int in4 = 9; // Controls direction of Motor B
 Adafruit_MPU6050 mpu;
 
 unsigned long previousTimeMotor = 0;
-unsigned long motorInterval = 6000; // Interval for motor movements
+unsigned long motorInterval = 5000; // Interval for motor movements
 
 unsigned long previousTimeMPU = 0;
 unsigned long mpuInterval = 5000; // Interval for MPU6050 readings
@@ -42,7 +42,7 @@ struct MPUData getMPUData();
 void printMPUData(MPUData data);
 
 void setup() {
-  // Set the motor pins as outputs
+  // Set the motor pins as Output
   pinMode(ena, OUTPUT);
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);
@@ -66,11 +66,10 @@ void setup() {
 int movment_counter = 0;
 String GPS_data = "";
 String data = "";
-String return_inputs = "";
-String return_outputs = "";
-String return_data = "";
+String return_output = "";
 
 unsigned long currentTime = 0;
+unsigned long hold_last_movement = 0;
 
 void loop() {
 
@@ -84,8 +83,6 @@ void loop() {
     // Parse the JSON data
     DynamicJsonDocument doc(1024); // Adjust the size as needed
     DeserializationError error = deserializeJson(doc, data);
-
-    
     
 
     // Verify that the data was received and parsed successfully
@@ -93,39 +90,39 @@ void loop() {
       // Access JSON data here
       String type = doc["Type"];
       String command = doc["Command"];
-      return_inputs = "\"Inputs\": [ {\"Type\": \"" + type + "\", \"Command\": \"" + command + "\"} ]";
-      return_outputs = "\"Outputs\": [ ] ";
+      return_output = "{\"Output\": [ ] }";
 
       if (type == "robot_move"){
         motor_controller(command, 255);
+        return_output = "{\"Output\": [{\"Type\": \"robot_move\", \"Data\": \"" + command + "\"}]}";
+        hold_last_movement = currentTime;
       }
       else if(type=="gps"){
         GPS_data = readGPSData();
-        return_outputs = "\"Outputs\": [{\"Type\": \"gps\", \"Data\": \"" + GPS_data + "\"}]";
+        return_output = "{\"Output\": [{\"Type\": \"gps\", \"Data\": \"" + GPS_data + "\"}]}";
         //Serial.print(GPS_data);
       }
-      
-
-      return_data = "{" + return_inputs + ", " + return_outputs + "}";
-      Serial.println(return_data);
-
-      //Serial.write(0);
-      //Serial.println("0");
-      //Serial.write('\n');
+      else{
+        return_output = "{\"Output\": [{\"Type\": \"Error\", \"Data\": \" Unknown type\" }]}";
+      }
+      Serial.println(return_output); // Stop character is '\n'
 
     } else {
-      //Serial.write(255);
-      Serial.println("255");
-      //Serial.write('\n');
+      Serial.println("{\"Output\": [{\"Type\": \"Error\", \"Data\": \"Parse Error\"}]}");
     }
   }
 
   // Check for MPU6050 readings
-  if (currentTime - previousTimeMPU >= mpuInterval) {
+  /*
+  else if (currentTime - previousTimeMPU >= mpuInterval) {
     MPUData data = getMPUData();
     printMPUData(data);
     Serial.println("0");
     previousTimeMPU = currentTime;
+  }
+  */
+  else if ( currentTime - hold_last_movement >= motorInterval){
+    stop();
   }
 }
 
@@ -213,9 +210,17 @@ void backward(int speed) {
 String readGPSData()
 {
   String gpsData = "";
+
+  int max_serial_time = 500;
+  unsigned long start_time = millis();
+
   // Read GPS data if available
   while (gpsSerial.available() > 0)
   {
+    if (millis() - start_time > max_serial_time)
+    {
+      break;
+    }
     char c = gpsSerial.read();
     gpsData += c;
     delay(5); // Small delay to allow the buffer to fill
@@ -265,3 +270,10 @@ void printMPUData(MPUData data)
   Serial.print(data.temp);
   Serial.print(" degC ---");
 }
+
+/*
+Test request:
+{"Type": "robot_move", "Command": "forward"}
+
+
+*/

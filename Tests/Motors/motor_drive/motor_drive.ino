@@ -51,9 +51,7 @@ void setup() {
 int movment_counter = 0;
 String GPS_data = "";
 
-String return_inputs = "";
-String return_outputs = "";
-String return_data = "";
+String return_output = "";
 String data = "";
 
 unsigned long currentTime = 0;
@@ -75,8 +73,7 @@ void loop() {
       String type = doc["Type"];
       String command = doc["Command"];
 
-      return_inputs = "{\"Inputs\": [{\"Type\": \"robot_move\", \"Command\": \"forward\"}] }";
-      return_outputs = "{\"Outputs\": [ ] }";
+      return_output = "{\"Outputs\": [ ] }";
       
       // Perform action based on JSON data
       if(type == "robot_move" && command == "forward") {
@@ -94,12 +91,11 @@ void loop() {
       else if (type == "gps") {
         //By using gpsSerial.read(), generate GPS_data var
         GPS_data = gpsSerial.read();
-        return_outputs = "{\"Outputs\": [{\"Type\": \"gps\", \"Data\": \"" + GPS_data + "\"}] }";
+        return_output = "{\"Outputs\": [{\"Type\": \"gps\", \"Data\": \"" + GPS_data + "\"}] }";
       }
 
-      return_data = return_inputs + return_outputs;
 
-      Serial.println(return_data);
+      Serial.println(return_output);
 
     } else {
       Serial.println("Failed to parse JSON");

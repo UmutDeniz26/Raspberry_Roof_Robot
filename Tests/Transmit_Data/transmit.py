@@ -25,6 +25,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 # Sensörden mesafe verisini oku
                 #distance = read_distance_sensor()
                 # Veriyi gönder
+                
                 conn.sendall(f"Mesafe: {5}\n".encode('utf-8'))
                 # Her saniyede bir güncelleme gönder
                 time.sleep(1)
