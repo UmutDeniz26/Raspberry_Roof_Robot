@@ -51,9 +51,9 @@ void setup() {
   pinMode(in4, OUTPUT);
 
   gpsSerial.begin(9600);
-
   Serial.begin(115200);
 
+  /*
   // Initialize MPU6050
   if (!mpu.begin()) {
     while (1) {
@@ -61,6 +61,7 @@ void setup() {
       delay(10);
     }
   }
+  */
 }
 
 int movment_counter = 0;
@@ -72,9 +73,10 @@ unsigned long currentTime = 0;
 unsigned long hold_last_movement = 0;
 
 void loop() {
-
+  // Get the current time
   currentTime = millis();
   
+  // Check for incoming data
   if (Serial.available() > 0) {
 
     // Read the incoming data *Note: Our stop character is '\n'
@@ -84,14 +86,12 @@ void loop() {
     DynamicJsonDocument doc(1024); // Adjust the size as needed
     DeserializationError error = deserializeJson(doc, data);
     
-
     // Verify that the data was received and parsed successfully
     if (!error) {
       // Access JSON data here
       String type = doc["Type"];
       String command = doc["Command"];
-      return_output = "{\"Output\": [ ] }";
-
+      
       if (type == "robot_move"){
         motor_controller(command, 255);
         return_output = "{\"Output\": [{\"Type\": \"robot_move\", \"Data\": \"" + command + "\"}]}";
@@ -100,7 +100,6 @@ void loop() {
       else if(type=="gps"){
         GPS_data = readGPSData();
         return_output = "{\"Output\": [{\"Type\": \"gps\", \"Data\": \"" + GPS_data + "\"}]}";
-        //Serial.print(GPS_data);
       }
       else{
         return_output = "{\"Output\": [{\"Type\": \"Error\", \"Data\": \" Unknown type\" }]}";
@@ -111,7 +110,9 @@ void loop() {
       Serial.println("{\"Output\": [{\"Type\": \"Error\", \"Data\": \"Parse Error\"}]}");
     }
   }
-
+  else if ( currentTime - hold_last_movement >= motorInterval){
+    stop();
+  }
   // Check for MPU6050 readings
   /*
   else if (currentTime - previousTimeMPU >= mpuInterval) {
@@ -121,9 +122,6 @@ void loop() {
     previousTimeMPU = currentTime;
   }
   */
-  else if ( currentTime - hold_last_movement >= motorInterval){
-    stop();
-  }
 }
 
 void motor_controller(String command, int speed){
@@ -146,7 +144,6 @@ void motor_controller(String command, int speed){
 
 
 void stop() {
-  //Serial.println("Stop direction");
   //STOP
   digitalWrite(in1, LOW);
   digitalWrite(in2, LOW);
@@ -155,8 +152,6 @@ void stop() {
 }
 
 void forward(int speed) {
-  //Serial.println("Forward direction");
-
   //MOTOR_A CLOCKWISE MAX SPEED
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
@@ -169,7 +164,6 @@ void forward(int speed) {
 }
 
 void right(int speed) {
-  //Serial.println("Right direction");
   //MOTOR_A CLOCKWISE MAX SPEED
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
@@ -182,7 +176,6 @@ void right(int speed) {
 }
 
 void left(int speed) {
-  //Serial.println("Left direction");
   //MOTOR_A COUNTERCLOCKWISE MAX SPEED
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);
@@ -195,7 +188,6 @@ void left(int speed) {
 }
 
 void backward(int speed) {
-  //Serial.println("Backward direction");
   //MOTOR_A COUNTERCLOCKWISE MAX SPEED
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);
@@ -229,6 +221,7 @@ String readGPSData()
   return gpsData;
 }
 
+/*
 // Get MPU6050 readings
 MPUData getMPUData()
 {
@@ -270,10 +263,9 @@ void printMPUData(MPUData data)
   Serial.print(data.temp);
   Serial.print(" degC ---");
 }
+*/
 
 /*
 Test request:
 {"Type": "robot_move", "Command": "forward"}
-
-
 */
