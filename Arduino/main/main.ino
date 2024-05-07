@@ -11,13 +11,13 @@ int enb = 10; // Motor B
 int in3 = 8; // Controls direction of Motor B
 int in4 = 9; // Controls direction of Motor B
 
-Adafruit_MPU6050 mpu;
+//Adafruit_MPU6050 mpu;
 
 unsigned long previousTimeMotor = 0;
-unsigned long motorInterval = 5000; // Interval for motor movements
+const unsigned long motorInterval = 5000; // Interval for motor movements
 
 unsigned long previousTimeMPU = 0;
-unsigned long mpuInterval = 5000; // Interval for MPU6050 readings
+const unsigned long mpuInterval = 5000; // Interval for MPU6050 readings
 
 int RXPin = 2;
 int TXPin = 3;
@@ -64,10 +64,7 @@ void setup() {
   */
 }
 
-int movment_counter = 0;
-String GPS_data = "";
-String data = "";
-String return_output = "";
+String GPS_data,data,return_output;
 
 unsigned long currentTime = 0;
 unsigned long hold_last_movement = 0;
@@ -92,6 +89,7 @@ void loop() {
       String type = doc["Type"];
       String command = doc["Command"];
       
+      // Check the type of command
       if (type == "robot_move"){
         motor_controller(command, 255);
         return_output = "{\"Output\": [{\"Type\": \"robot_move\", \"Data\": \"" + command + "\"}]}";
@@ -101,18 +99,22 @@ void loop() {
         GPS_data = readGPSData();
         return_output = "{\"Output\": [{\"Type\": \"gps\", \"Data\": \"" + GPS_data + "\"}]}";
       }
+      // Add more commands here
       else{
         return_output = "{\"Output\": [{\"Type\": \"Error\", \"Data\": \" Unknown type\" }]}";
       }
       Serial.println(return_output); // Stop character is '\n'
 
-    } else {
+    } 
+    else{
       Serial.println("{\"Output\": [{\"Type\": \"Error\", \"Data\": \"Parse Error\"}]}");
     }
   }
   else if ( currentTime - hold_last_movement >= motorInterval){
+    hold_last_movement = currentTime;
     stop();
   }
+
   // Check for MPU6050 readings
   /*
   else if (currentTime - previousTimeMPU >= mpuInterval) {
@@ -201,19 +203,17 @@ void backward(int speed) {
 
 String readGPSData()
 {
-  String gpsData = "";
-
-  int max_serial_time = 500;
+  // Initialize variables
+  const int max_serial_time = 1000;
+  char c; String gpsData;
   unsigned long start_time = millis();
-
+  
   // Read GPS data if available
   while (gpsSerial.available() > 0)
   {
-    if (millis() - start_time > max_serial_time)
-    {
-      break;
-    }
-    char c = gpsSerial.read();
+    // Break if time exceeds max_serial_time
+    if (millis() - start_time > max_serial_time) {break;}
+    c = gpsSerial.read();
     gpsData += c;
     delay(5); // Small delay to allow the buffer to fill
   }
