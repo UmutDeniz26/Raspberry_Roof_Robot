@@ -48,12 +48,12 @@ def send_message_to_server(loop_cnt=1):
             s.sendall(message.encode('utf-8'))
             data = s.recv(1024).decode('utf-8')
             print(f"Received data: {data}")
+            time.sleep(5)
 
             """
             if (hold_data+1)%test_data_len != json.loads(data)["data"] and hold_data != 0:
                 print(f"Error: {(hold_data+1)%100} != {json.loads(data)['data']}")
                 break
-
             hold_data = json.loads(data)["data"]
             """
             timer.stop_timer("send_message_to_server")

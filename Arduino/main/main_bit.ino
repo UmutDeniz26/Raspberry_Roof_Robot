@@ -70,50 +70,42 @@ unsigned long currentTime = 0;
 unsigned long hold_last_movement = 0;
 
 void loop() {
-  // Get the current time
-  currentTime = millis();
-  
-  // Check for incoming data
-  if (Serial.available() > 0) {
+    // Get the current time
+    currentTime = millis();
 
-    // Read the incoming data *Note: Our stop character is '\n'
-    data = Serial.readStringUntil('\n');
+    // Check for incoming data
+    if (Serial.available() > 0) {
 
-    // Parse the JSON data
-    DynamicJsonDocument doc(1024); // Adjust the size as needed
-    DeserializationError error = deserializeJson(doc, data);
-    
-    // Verify that the data was received and parsed successfully
-    if (!error) {
-      // Access JSON data here
-      String type = doc["Type"];
-      String command = doc["Command"];
-      
-      // Check the type of command
-      if (type == "robot_move"){
-        motor_controller(command, 255);
-        return_output = "{\"robot_move\": "+command +"}";
-        hold_last_movement = currentTime;
-      }
-      else if(type=="gps"){
-        GPS_data = readGPSData();
-        return_output = "{\"gps\": "+GPS_data+"}";   
-      }
-      // Add more commands here
-      else{
-        return_output = "{\"Error\":\"Unknown type\"}";
-      }
-    } 
-    else{
-      return_output = "{\"Error\":\"Parse Error\"}";
+        // Read the incoming data *Note: Our stop character is '\n'
+        data = Serial.readStringUntil('\n');
+        
+        // Verify that the data was received and parsed successfully
+        // Access JSON data here
+        String type = "";
+        String command = "";
+        
+        // Check the type of command
+        if (data[0] == '0'){ 
+            motor_controller(data, 255);
+            return_output = "{\"robot_move\": "+ data +"}";
+            hold_last_movement = currentTime;
+        }
+        else if(data == '1111'){
+            GPS_data = readGPSData();
+            return_output = "{\"gps\": "+GPS_data+"}";   
+        }
+        // Add more commands here
+        else{
+            return_output = "{\"Error\":\"Unknown type\"}";
+        }
+        Serial.println(return_output); // Stop character is '\n'
+
     }
-    Serial.println(return_output); // Stop character is '\n'
-
-  }
-  else if ( currentTime - hold_last_movement >= motor_time_out){
-    hold_last_movement = currentTime;
-    stop();
-  }
+    else if ( currentTime - hold_last_movement >= motor_time_out){
+        hold_last_movement = currentTime;
+        stop();
+    }
+    
 
   // Check for MPU6050 readings
   /*
@@ -127,19 +119,19 @@ void loop() {
 }
 
 void motor_controller(String command, int speed){
-  if(command=="forward"){
+  if(command=="0000"){
     forward(speed);
   }
-  else if(command=="backward"){
+  else if(command=="0001"){
     backward(speed);
   }
-  else if(command=="left"){
+  else if(command=="0010"){
     left(speed);
   }
-  else if(command=="right"){
+  else if(command=="0011"){
     right(speed);
   }
-  else if(command=="stop"){
+  else if(command=="0100"){
     stop();
   }
 }

@@ -9,7 +9,7 @@ dict_bit_convert = {
     "robot_move-left": 0b0010,
     "robot_move-right": 0b0011,
     "robot_move-stop": 0b0100,
-    "gps-*": 0b0101,
+    "gps-*": 0b1111,
     "5": 0b0101,  # Assuming this is meant to be a hexadecimal digit
     "6": 0b0110,  # Assuming this is meant to be a hexadecimal digit
     "7": 0b0111,  # Assuming this is meant to be a hexadecimal digit
@@ -20,7 +20,7 @@ dict_bit_convert = {
     "c": 0b1100,
     "d": 0b1101,
     "e": 0b1110,
-    "f": 0b1111
+    "f": 0b0101
 }
 
 def dict_to_bit(data : dict) -> str:
