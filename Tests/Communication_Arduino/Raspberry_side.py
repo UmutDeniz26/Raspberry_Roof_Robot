@@ -1,5 +1,48 @@
 import serial
 import time
+import math
+import sys
+
+dict_bit_convert = {
+    "robot_move-forward": 0b0000,
+    "robot_move-backward": 0b0001,
+    "robot_move-left": 0b0010,
+    "robot_move-right": 0b0011,
+    "robot_move-stop": 0b0100,
+    "gps-*": 0b0101,
+    "5": 0b0101,  # Assuming this is meant to be a hexadecimal digit
+    "6": 0b0110,  # Assuming this is meant to be a hexadecimal digit
+    "7": 0b0111,  # Assuming this is meant to be a hexadecimal digit
+    "8": 0b1000,  # Assuming this is meant to be a hexadecimal digit
+    "9": 0b1001,  # Assuming this is meant to be a hexadecimal digit
+    "a": 0b1010,
+    "b": 0b1011,
+    "c": 0b1100,
+    "d": 0b1101,
+    "e": 0b1110,
+    "f": 0b1111
+}
+
+def dict_to_bit(data : dict) -> str:
+    """
+        Convert a dictionary to a bit string.
+
+        Args:
+            data (dict): The dictionary to convert to a bit string.
+
+        Returns:
+            str: The bit string.
+    """
+    if data["Type"] == "gps":
+        data["Command"] = "*"
+    type_ = data["Type"]
+    command = data["Command"]
+    bit_string = f"{type_}-{command}"
+    bit_arr = dict_bit_convert[bit_string]
+    #bit_arr = bit_arr.to_bytes(1, byteorder='big')
+
+    return bit_arr
+
 
 def transmit_receive_arduino_message(message_dict: dict, timeout_limit: int):
     """
@@ -16,22 +59,28 @@ def transmit_receive_arduino_message(message_dict: dict, timeout_limit: int):
 
     ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
     ser.reset_input_buffer()
-    hold = time.time()
-
+    
     if "\n" not in message:
         return "{'error': 'Message must end with a newline character.'}"
-
+    
+    #bit_arr = dict_to_bit(message_dict)
+    #print(bit_arr, " Type: ", type(bit_arr), " Size: ", sys.getsizeof(bit_arr))
+    hold = time.time()
+    while True:
+        ser.write(message.encode('utf-8'))
+        if math.fabs(time.time() - hold) > 0.5:
+            return
+    """
     while True:
         
-        ser.write(message.encode())
+        ser.write(message.encode('utf-8'))
+        time.sleep(0.1)
         line = ser.readline().decode('utf-8').rstrip()
         if line:
             return line
-        
-        if time.time() - hold > timeout_limit:
+        elif time.time() - hold > timeout_limit:
             return "{'error': 'Timeout limit reached.'}"
-        
-        time.sleep(0.1)
+    """
 
 
 def json_dict_to_string(json_dict: dict) -> str:
@@ -61,12 +110,14 @@ def get_system_clock_time() -> str:
 # Test the function
 def test():
     # Generate a sample message
-    json_message = {"message": "Hello Arduino how are you", "transmit_time": get_system_clock_time()}
-    string_message = json_dict_to_string(json_message)
+    # json_message = {"message": "Hello Arduino how are you", "transmit_time": get_system_clock_time()}
+    # string_message = json_dict_to_string(json_message)
 
     # Transmit the message and receive the response
-    response = transmit_receive_arduino_message(string_message, 10)
-    print(response)
+    # response = transmit_receive_arduino_message(string_message, 10)
+    # print(response)
+
+    print(dict_to_bit({"Type": "robot_move", "Command": "backward"}))
 
 if __name__ == "__main__":
     test()

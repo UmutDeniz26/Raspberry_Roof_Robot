@@ -5,6 +5,7 @@ import asyncio
 import sys
 import os
 import errno
+import time
 
 sys.path.insert(1, 'Tests/Communication_Arduino')
 import Raspberry_side as rasp
@@ -40,7 +41,7 @@ def get_host_ip_and_port():
 def main():
 
     HOST, PORT = get_host_ip_and_port()
-    
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((HOST, PORT))  
         s.listen()            
@@ -56,6 +57,10 @@ def main():
                     try:
                         data = conn.recv(1024)
                         conn.sendall(data)
+                        
+                        if not data:
+                            break
+
                     except ConnectionResetError:
                         print("Connection was reset by the client")
                         break
@@ -65,10 +70,14 @@ def main():
                     # Encode as JSON
                     try:
                         json_data = json.loads(data_string)
-                        #response_ard = rasp.transmit_receive_arduino_message(json_data, 5)
-                        #print(f"Data received from Arduino: {response_ard}")
-                    except:
-                        print("Error decoding JSON")
+                        time_start = time.time()
+                        response_ard = rasp.transmit_receive_arduino_message(json_data, 5)
+                        print(f"Time taken to send and receive data from Arduino: {time.time() - time_start}")
+                        
+                        print(f"Data received from Arduino: {response_ard}")
+                    except Exception as e:
+                        print("Error decoding JSON or sending message : ", data_string)
+                        print(e)
                         continue
                     
 
