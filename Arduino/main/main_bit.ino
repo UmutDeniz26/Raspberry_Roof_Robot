@@ -200,6 +200,11 @@ String readGPSData()
     // Break if time exceeds max_serial_time
     if (millis() - start_time > max_serial_time) {break;}
     c = gpsSerial.read();
+
+    if(c == '\n'){
+      c = " ";
+    }
+    
     gpsData += c;
     delay(5); // Small delay to allow the buffer to fill
   }

@@ -41,10 +41,10 @@ def send_message_to_server(loop_cnt=1):
             message = test_data_array[i % len(test_data_array)]# if i %2 == 0 else test_data_array[-1]
             
             s.sendall(message.encode('utf-8'))
-            data = s.recv(1024).decode('utf-8')
+            data = s.recv(2048).decode('utf-8')
             print(f"\nSent data: {message}")
             print(f"Received data: {data}")
-            time.sleep(2)
+            time.sleep(1)
 
             """
             # To test the data integrity
