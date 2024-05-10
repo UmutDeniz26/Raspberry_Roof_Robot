@@ -7,6 +7,7 @@
 import socket
 import sys
 import time
+import re
 
 sys.path.insert(0,".")
 from Utils.timer import Timer
@@ -43,8 +44,10 @@ def send_message_to_server(loop_cnt=1):
             s.sendall(message.encode('utf-8'))
             data = s.recv(2048).decode('utf-8')
             print(f"\nSent data: {message}")
-            print(f"Received data: {data}")
-            time.sleep(1)
+
+            data = re.sub('[^a-zA-Z0-9\n\.,*$]', '', data).split("$")[-1]
+            print("Received data: ",data)
+            time.sleep(0.1)
 
             """
             # To test the data integrity
