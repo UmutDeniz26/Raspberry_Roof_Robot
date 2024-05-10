@@ -43,9 +43,7 @@ def send_message_to_server(loop_cnt=1):
             
             s.sendall(message.encode('utf-8'))
             data = s.recv(2048).decode('utf-8')
-            print(f"\nSent data: {message}")
-
-            data = re.sub('[^a-zA-Z0-9\n\.,*$]', '', data).split("$")[-1]
+            print(f"\nSent data: {message}")    
             print("Received data: ",data)
             time.sleep(0.1)
 
