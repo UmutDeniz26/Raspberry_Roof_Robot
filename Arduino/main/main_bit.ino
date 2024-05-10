@@ -82,16 +82,15 @@ void loop() {
         // Check the type of command
         if (data[0] == '0'){ 
             motor_controller(data, 255);
-            return_output = "{\"robot_move\": "+ data +"}";
+            return_output = data;
             hold_last_movement = currentTime;
         }
         else if(data == "1111"){
-            GPS_data = readGPSData();
-            return_output = "{\"gps\": "+GPS_data+"}";   
+            return_output = readGPSData();   
         }
         // Add more commands here
         else{
-            return_output = "{\"Error\":\"Unknown type\"}";
+            return_output = "Unknown Type";
         }
         Serial.println(return_output); // Stop character is '\n'
 
@@ -201,11 +200,11 @@ String readGPSData()
     if (millis() - start_time > max_serial_time) {break;}
     c = gpsSerial.read();
 
-    if(c == '\n'){
-      c = " ";
+    if(c != '\n'){
+      gpsData += c;
+      
     }
     
-    gpsData += c;
     delay(5); // Small delay to allow the buffer to fill
   }
 
