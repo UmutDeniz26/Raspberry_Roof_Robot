@@ -1,10 +1,15 @@
+"""
+
+    This test sends commands from computer to Raspberry Pi
+
+"""
+
 import socket
 import sys
 import time
-import json
 
-sys.path.insert(1, '.')
-from Others.timer import Timer
+sys.path.insert(0,".")
+from Utils.timer import Timer
 
 HOST = "192.168.1.13"
 PORT = 5000

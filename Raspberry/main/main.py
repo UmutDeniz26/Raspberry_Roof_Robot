@@ -6,7 +6,7 @@ import time
 import sys
 
 sys.path.insert(0,"Raspberry")
-from others import get_available_stream
+from Raspberry.others import Stream_operations
 from others import Common
 
 from server_operations import Send_message as rasp
@@ -19,7 +19,7 @@ class Raspberry_Server:
     def __init__(self,echo_server:bool) -> None:
         
         # Set attributes
-        self.echo_server = echo_server # Echo server -> Sends the data back to the client
+        self.ECHO_SERVER = echo_server # Echo server -> Sends the data back to the client
         
 
     def init_server(self,HOST: int, PORT: int) -> None:
@@ -74,7 +74,7 @@ class Raspberry_Server:
                         break
                     
                     # Send the data back to the client ( Optional ) ( Echo server )
-                    conn.sendall(data_received) if self.echo_server else None
+                    conn.sendall(data_received) if self.ECHO_SERVER else None
 
                     # Decode the data
                     data_received_string = data_received.decode('utf-8')
@@ -84,10 +84,11 @@ class Raspberry_Server:
                     
                     # Sending the message to the Arduino
                     time_start = time.time()
-                    response_ard = rasp.transmit_receive_arduino_message(json_data, 5)
+                    response_from_arduino = rasp.transmit_receive_arduino_message(json_data, 5)
                     print(f"Time taken to send and receive data from Arduino: {time.time() - time_start}")
                     
-                    print(f"Data received from Arduino: {response_ard}")
+                    # Print the response
+                    print(f"Data received from Arduino: {response_from_arduino}")
                 
             
 
@@ -102,7 +103,7 @@ class Raspberry_Server:
 def main():
 
     # Get the IP address and port
-    HOST, PORT = get_available_stream.get_host_ip_and_port()
+    HOST, PORT = Stream_operations.get_host_ip_and_port()
 
     server = Raspberry_Server()
     server.init_server(HOST, PORT)

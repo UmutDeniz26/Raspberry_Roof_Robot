@@ -1,7 +1,6 @@
 import serial
 import time
 import math
-import sys
 
 dict_bit_convert = {
     "robot_move-forward": 0b0000,
@@ -70,14 +69,14 @@ def transmit_receive_arduino_message(message_dict: dict, timeout_limit: int):
     
     #bit_arr = dict_to_bit(message_dict)
     #print(bit_arr, " Type: ", type(bit_arr), " Size: ", sys.getsizeof(bit_arr))
+    
     hold = time.time()
     while True:
         ser.write(message.encode('utf-8'))
         if math.fabs(time.time() - hold) > 0.5:
             return
     """
-    while True:
-        
+    while True:    
         ser.write(message.encode('utf-8'))
         time.sleep(0.1)
         line = ser.readline().decode('utf-8').rstrip()
@@ -91,7 +90,7 @@ def transmit_receive_arduino_message(message_dict: dict, timeout_limit: int):
 def json_dict_to_string(json_dict: dict) -> str:
     """
         Convert a dictionary to a json string. Deletes \n characters from the string. 
-        Then adds a newline character at the end.
+        Then adds a newline character at the end. Because of stop symbol on the Arduino side is newline char.
 
         Args:
             json_dict (dict): The dictionary to convert to a json string.
@@ -103,26 +102,5 @@ def json_dict_to_string(json_dict: dict) -> str:
     return json_string + "\n"
 
 
-def get_system_clock_time() -> str:
-    """
-        Get the current system clock time in seconds. In format of hh:mm:ss.
-
-        Returns:
-            int: The current system clock time in seconds.
-    """
-    return time.strftime("%H:%M:%S")
-
-# Test the function
-def test():
-    # Generate a sample message
-    # json_message = {"message": "Hello Arduino how are you", "transmit_time": get_system_clock_time()}
-    # string_message = json_dict_to_string(json_message)
-
-    # Transmit the message and receive the response
-    # response = transmit_receive_arduino_message(string_message, 10)
-    # print(response)
-
-    print(dict_to_bit({"Type": "robot_move", "Command": "backward"}))
-
 if __name__ == "__main__":
-    test()
+    pass
