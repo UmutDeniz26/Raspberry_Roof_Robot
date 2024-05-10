@@ -48,44 +48,42 @@ def dict_to_bit(data : dict) -> str:
     return bit_val
 
 
-def transmit_receive_arduino_message(message_dict: dict, timeout_limit: int):
+def transmit_receive_arduino_message(message_dict: dict, timeout_limit: int, wait_response: bool):
     """
         Transmit a message to the Arduino and wait for a response.
 
         Args:
             message_dict (dict): The message to send to the Arduino.
             timeout_limit (int): The time to wait for a response from the Arduino. *Note: The timeout is in seconds.
-
+            wait_response (bool): The Bool value about waiting reponse from Arduino or not.
+            
         Returns:
             str: The response from the Arduino. *Note: In form of json string.
     """
-    message = json_dict_to_string(message_dict)
-
-    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
-    ser.reset_input_buffer()
-    
-    if "\n" not in message:
+    if type(message) == dict:
+        message = json_dict_to_string(message_dict)
+    elif "\n" not in message:
         return "{'error': 'Message must end with a newline character.'}"
     
     #bit_arr = dict_to_bit(message_dict)
     #print(bit_arr, " Type: ", type(bit_arr), " Size: ", sys.getsizeof(bit_arr))
-    
+
+    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+    ser.reset_input_buffer()
+
     hold = time.time()
     while True:
         ser.write(message.encode('utf-8'))
-        if math.fabs(time.time() - hold) > 0.5:
-            return
-    """
-    while True:    
-        ser.write(message.encode('utf-8'))
-        time.sleep(0.1)
-        line = ser.readline().decode('utf-8').rstrip()
-        if line:
-            return line
-        elif time.time() - hold > timeout_limit:
-            return "{'error': 'Timeout limit reached.'}"
-    """
 
+        if wait_response:
+            line = ser.readline().decode('utf-8').rstrip()
+            if line:
+                return line
+            elif time.time() - hold > timeout_limit:
+                return "{'error': 'Timeout limit reached.'}"
+        
+        if math.fabs(time.time() - hold) > 0.5 and (not wait_response):
+            return
 
 def json_dict_to_string(json_dict: dict) -> str:
     """

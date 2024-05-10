@@ -1,11 +1,11 @@
 import socket
-import json
-import subprocess
-import errno
+import serial
+import math
 import time
 import sys
 
 sys.path.insert(0,"Raspberry")
+sys.path.insert(0,".")
 from Raspberry.others import Stream_operations
 from others import Common
 
@@ -16,10 +16,12 @@ class Raspberry_Server:
         A class to represent a Raspberry Pi server.
     """
 
-    def __init__(self,echo_server:bool) -> None:
+    def __init__(self,echo_server:bool, wait_response:bool, time_out_limit:int) -> None:
         
         # Set attributes
         self.ECHO_SERVER = echo_server # Echo server -> Sends the data back to the client
+        self.WAIT_REPONSE_FROM_ARDUINO = wait_response
+        self.WAIT_REPONSE_TIMEOUT_LIMIT = time_out_limit
         
 
     def init_server(self,HOST: int, PORT: int) -> None:
@@ -53,6 +55,37 @@ class Raspberry_Server:
                 message (str): The message to send to the client.
         """
         self.socket.sendall(message.encode('utf-8'))
+
+    def init_serial_port(self):
+        self.ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+        
+
+    def transmit_receive_arduino(self, message_dict):
+
+        if type(message_dict) == dict:
+            message = rasp.json_dict_to_string(message_dict)
+        elif "\n" not in message:
+            return "{'error': 'Message must end with a newline character.'}"
+        
+        #bit_arr = dict_to_bit(message_dict)
+        #print(bit_arr, " Type: ", type(bit_arr), " Size: ", sys.getsizeof(bit_arr))
+
+        self.ser.reset_input_buffer()
+
+        hold = time.time()
+        while True:
+            self.write(message.encode('utf-8'))
+
+            if self.WAIT_REPONSE_FROM_ARDUINO:
+                line = self.ser.readline().decode('utf-8').rstrip()
+                if line:
+                    return line
+                elif time.time() - hold > self.WAIT_REPONSE_TIMEOUT_LIMIT:
+                    return "{'error': 'Timeout limit reached.'}"
+            
+            if math.fabs(time.time() - hold) > 0.5 and (not self.WAIT_REPONSE_FROM_ARDUINO):
+                return
+
 
     def main_loop(self) -> None:
         """
