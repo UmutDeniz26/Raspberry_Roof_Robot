@@ -44,7 +44,7 @@ def send_message_to_server(loop_cnt=1):
             #data = s.recv(1024).decode('utf-8')
             print(f"\nSent data: {message}")
             #print(f"Received data: {data}")
-            time.sleep(0.8)
+            time.sleep(0.1)
 
             """
             if (hold_data+1)%test_data_len != json.loads(data)["data"] and hold_data != 0:
@@ -58,5 +58,5 @@ def send_message_to_server(loop_cnt=1):
 
 
 if __name__ == "__main__":
-    send_message_to_server(50)
+    send_message_to_server(500)
     
