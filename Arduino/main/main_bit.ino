@@ -202,7 +202,7 @@ String readGPSData()
     c = gpsSerial.read();
 
     if(c == '\n'){
-      c = "\\";
+      c = " ";
     }
     
     gpsData += c;
