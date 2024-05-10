@@ -10,11 +10,11 @@ dict_bit_convert = {
     "robot_move-right": 0b0011,
     "robot_move-stop": 0b0100,
     "gps-*": 0b1111,
-    "5": 0b0101,  # Assuming this is meant to be a hexadecimal digit
-    "6": 0b0110,  # Assuming this is meant to be a hexadecimal digit
-    "7": 0b0111,  # Assuming this is meant to be a hexadecimal digit
-    "8": 0b1000,  # Assuming this is meant to be a hexadecimal digit
-    "9": 0b1001,  # Assuming this is meant to be a hexadecimal digit
+    "5": 0b0101,
+    "6": 0b0110,
+    "7": 0b0111,
+    "8": 0b1000,
+    "9": 0b1001,
     "a": 0b1010,
     "b": 0b1011,
     "c": 0b1100,
@@ -33,15 +33,20 @@ def dict_to_bit(data : dict) -> str:
         Returns:
             str: The bit string.
     """
+    # Check if the data is a gps message
     if data["Type"] == "gps":
         data["Command"] = "*"
+    
+    # Get the type and command from the dictionary
     type_ = data["Type"]
     command = data["Command"]
-    bit_string = f"{type_}-{command}"
-    bit_arr = dict_bit_convert[bit_string]
+    
+    # Combine the type and command to form a bit string
+    bit_string_key = f"{type_}-{command}"
+    bit_val = dict_bit_convert[bit_string_key]
     #bit_arr = bit_arr.to_bytes(1, byteorder='big')
 
-    return bit_arr
+    return bit_val
 
 
 def transmit_receive_arduino_message(message_dict: dict, timeout_limit: int):

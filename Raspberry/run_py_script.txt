@@ -1,0 +1,2 @@
+cd ~/anaconda_envs/Raspberry_Roof_Robot # This should change
+python3 Raspberry/main/main.py
