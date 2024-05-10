@@ -84,7 +84,8 @@ class Raspberry_Server:
 
             if self.WAIT_REPONSE_FROM_ARDUINO:
                 line = self.ser.readline().decode('utf-8').rstrip()
-                if line and line[-1] == "}" and line[0] == "{":
+                if line:
+                    print(line)
                     return line
                 elif time.time() - hold > self.WAIT_REPONSE_TIMEOUT_LIMIT:
                     return "{'information': 'Timeout limit reached.'}"
