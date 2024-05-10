@@ -17,9 +17,9 @@ PORT = 5000
 test_data_array = [
     "{\"Type\": \"robot_move\", \"Command\": \"forward\"}",
     "{\"Type\": \"robot_move\", \"Command\": \"backward\"}",
-    "{\"Type\": \"robot_move\", \"Command\": \"left\"}",
-    "{\"Type\": \"robot_move\", \"Command\": \"right\"}",
-    "{\"Type\": \"robot_move\", \"Command\": \"stop\"}",
+    #"{\"Type\": \"robot_move\", \"Command\": \"left\"}",
+    #"{\"Type\": \"robot_move\", \"Command\": \"right\"}",
+    #"{\"Type\": \"robot_move\", \"Command\": \"stop\"}",
     #"{\"Type\": \"gps\",\"Command\": \"get_data\"}"
 ]
 
@@ -44,7 +44,7 @@ def send_message_to_server(loop_cnt=1):
             #data = s.recv(1024).decode('utf-8')
             print(f"\nSent data: {message}")
             #print(f"Received data: {data}")
-            time.sleep(2)
+            time.sleep(0.8)
 
             """
             if (hold_data+1)%test_data_len != json.loads(data)["data"] and hold_data != 0:
