@@ -20,7 +20,7 @@ test_data_array = [
     #"{\"Type\": \"robot_move\", \"Command\": \"left\"}",
     #"{\"Type\": \"robot_move\", \"Command\": \"right\"}",
     #"{\"Type\": \"robot_move\", \"Command\": \"stop\"}",
-    #"{\"Type\": \"gps\",\"Command\": \"get_data\"}"
+    "{\"Type\": \"gps\",\"Command\": \"get_data\"}"
 ]
 
 avg_bit_length = sum([ sys.getsizeof(data) for data in test_data_array ]) / len(test_data_array)
@@ -38,15 +38,16 @@ def send_message_to_server(loop_cnt=1):
         for i in range(loop_cnt):
 
             timer.start_new_timer("send_message_to_server")
-
             message = test_data_array[i % len(test_data_array)]# if i %2 == 0 else test_data_array[-1]
+            
             s.sendall(message.encode('utf-8'))
-            #data = s.recv(1024).decode('utf-8')
+            data = s.recv(1024).decode('utf-8')
             print(f"\nSent data: {message}")
-            #print(f"Received data: {data}")
-            time.sleep(0.1)
+            print(f"Received data: {data}")
+            time.sleep(2)
 
             """
+            # To test the data integrity
             if (hold_data+1)%test_data_len != json.loads(data)["data"] and hold_data != 0:
                 print(f"Error: {(hold_data+1)%100} != {json.loads(data)['data']}")
                 break
