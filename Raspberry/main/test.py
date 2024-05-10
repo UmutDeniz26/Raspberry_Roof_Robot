@@ -25,7 +25,7 @@ test_data_array = [
 
 avg_bit_length = sum([ sys.getsizeof(data) for data in test_data_array ]) / len(test_data_array)
 print("Average bit size of test_data_array:", avg_bit_length, "bits")
-
+    
 
 # Sends message to the server
 def send_message_to_server(loop_cnt=1):

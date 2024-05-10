@@ -41,8 +41,8 @@ class Raspberry_Server:
         
         # Set attributes
         self.ECHO_SERVER = echo_server # Echo server -> Sends the data back to the client
-        self.WAIT_REPONSE_FROM_ARDUINO = wait_response
-        self.WAIT_REPONSE_TIMEOUT_LIMIT = time_out_limit
+        self.WAIT_REPONSE_FROM_ARDUINO = wait_response # Wait for a response from the Arduino
+        self.WAIT_REPONSE_TIMEOUT_LIMIT = time_out_limit # Time out limit for the response from the Arduino
         
 
     def init_server(self,HOST: int, PORT: int) -> None:
@@ -64,11 +64,10 @@ class Raspberry_Server:
         
         # Listen for incoming connections
         self.socket.listen()
-
         print(f"Server is listening on {self.HOST}:{self.PORT}...")
 
 
-    def send_str_message(self, message: str) -> None:
+    def send_str_message_on_socket(self, message: str) -> None:
         """
             Send a string message to the client.
 
@@ -76,6 +75,15 @@ class Raspberry_Server:
                 message (str): The message to send to the client.
         """
         self.socket.sendall(message.encode('utf-8'))
+
+    def send_str_message_on_serial_port(self, message: str) -> None:
+        """
+            Send a string message to the Arduino.
+
+            Args:
+                message (str): The message to send to the Arduino.
+        """
+        self.ser.write(message.encode('utf-8'))
 
     def init_serial_port(self):
         self.ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
@@ -129,7 +137,11 @@ class Raspberry_Server:
 
         hold = time.time()
         while True:
-            self.ser.write( self.dict_to_bit(message_dict).encode('utf-8') )
+            
+            # Send the message to the Arduino
+            message = self.dict_to_bit(message_dict) + "\n"
+
+            self.send_str_message_on_serial_port(message) 
 
             if self.WAIT_REPONSE_FROM_ARDUINO:
                 line = self.ser.readline().decode('utf-8').rstrip()
