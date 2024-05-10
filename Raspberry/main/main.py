@@ -8,35 +8,12 @@ sys.path.insert(0,"Raspberry")
 sys.path.insert(0,".")
 from Raspberry.others import Stream_operations
 from others import Common
-
 from server_operations import Send_message as rasp
-
-
-BIT_MAP = {
-    "robot_move-forward": "0000",
-    "robot_move-backward": "0001",
-    "robot_move-left": "0010",
-    "robot_move-right": "0011",
-    "robot_move-stop": "0100",
-    "gps-*": "1111",
-    "5": 0b0101,
-    "6": 0b0110,
-    "7": 0b0111,
-    "8": 0b1000,
-    "9": 0b1001,
-    "a": 0b1010,
-    "b": 0b1011,
-    "c": 0b1100,
-    "d": 0b1101,
-    "e": 0b1110,
-    "f": 0b0101
-}
 
 class Raspberry_Server:
     """
-        A class to represent a Raspberry Pi server.
+        A class to run the server on the Raspberry Pi.
     """
-
     def __init__(self,echo_server:bool, wait_response:bool, time_out_limit:int) -> None:
         
         # Set attributes
@@ -64,55 +41,17 @@ class Raspberry_Server:
         
         # Listen for incoming connections
         self.socket.listen()
+        
         print(f"Server is listening on {self.HOST}:{self.PORT}...")
-
-
-    def send_str_message_on_socket(self, message: str) -> None:
-        """
-            Send a string message to the client.
-
-            Args:
-                message (str): The message to send to the client.
-        """
-        self.socket.sendall(message.encode('utf-8'))
-
-    def send_str_message_on_serial_port(self, message: str) -> None:
-        """
-            Send a string message to the Arduino.
-
-            Args:
-                message (str): The message to send to the Arduino.
-        """
-        self.ser.write(message.encode('utf-8'))
 
     def init_serial_port(self):
         self.ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
-        
 
-    def dict_to_bit(self,data : dict) -> str:
-        """
-            Convert a dictionary to a bit string.
+    def send_str_message_on_socket(self, message: str) -> None:
+        self.socket.sendall(message.encode('utf-8'))
 
-            Args:
-                data (dict): The dictionary to convert to a bit string.
-
-            Returns:
-                str: The bit string.
-        """
-        # Check if the data is a gps message
-        if data["Type"] == "gps":
-            data["Command"] = "*"
-        
-        # Get the type and command from the dictionary
-        type_ = data["Type"]
-        command = data["Command"]
-        
-        # Combine the type and command to form a bit string
-        bit_string_key = f"{type_}-{command}"
-        bit_val = BIT_MAP[bit_string_key]
-        #bit_arr = bit_arr.to_bytes(1, byteorder='big')
-
-        return bit_val
+    def send_str_message_on_serial_port(self, message: str) -> None:
+        self.ser.write(message.encode('utf-8'))
 
     def transmit_receive_arduino(self, message_dict: dict) -> str:
         """
@@ -127,19 +66,17 @@ class Raspberry_Server:
         """
 
         if type(message_dict) == dict:
-            message = rasp.json_dict_to_string(message_dict)
+            message = Common.json_dict_to_string(message_dict)
         elif "\n" not in message:
             return "{'error': 'Message must end with a newline character.'}"
-        
-        #bit_arr = dict_to_bit(message_dict);print(bit_arr, " Type: ", type(bit_arr), " Size: ", sys.getsizeof(bit_arr))
-
+    
         self.ser.reset_input_buffer()
-
         hold = time.time()
         while True:
             
             # Send the message to the Arduino
-            message = self.dict_to_bit(message_dict) + "\n"
+            message = Common.dict_to_bit(message_dict) + "\n"
+            # print(message, " Type: ", type(message), " Size: ", sys.getsizeof(message))
 
             self.send_str_message_on_serial_port(message) 
 
@@ -149,9 +86,8 @@ class Raspberry_Server:
                     return line
                 elif time.time() - hold > self.WAIT_REPONSE_TIMEOUT_LIMIT:
                     return "{'error': 'Timeout limit reached.'}"
-            
-            if math.fabs(time.time() - hold) > 0.7 and (not self.WAIT_REPONSE_FROM_ARDUINO):
-                return
+            elif math.fabs(time.time() - hold) > 0.7:
+                return "{'information': 'Waiting for response is disabled.'}"
 
 
     def main_loop(self) -> None:
@@ -180,7 +116,7 @@ class Raspberry_Server:
                     data_received_string = data_received.decode('utf-8')
 
                     # Encode as JSON
-                    json_data = Common.get_json_format(data_received_string)
+                    json_data = Common.str_to_json_dict(data_received_string)
                     
                     # Sending the message to the Arduino
                     time_start = time.time()
@@ -194,9 +130,8 @@ class Raspberry_Server:
 
     def __del__(self) -> None:
         """
-            Destructor.
+            Destructor. Closes the socket and serial port.
         """
-        # Close the socket
         self.socket.close()
         self.ser.close()
 
@@ -210,6 +145,8 @@ def main():
     server.init_server(HOST, PORT)
     server.init_serial_port()
     server.main_loop()
+ 
+    del server
 
 if __name__ == "__main__":
     main()

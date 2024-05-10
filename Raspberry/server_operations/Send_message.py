@@ -85,20 +85,5 @@ def transmit_receive_arduino_message(message_dict: dict, timeout_limit: int, wai
         if math.fabs(time.time() - hold) > 0.5 and (not wait_response):
             return
 
-def json_dict_to_string(json_dict: dict) -> str:
-    """
-        Convert a dictionary to a json string. Deletes \n characters from the string. 
-        Then adds a newline character at the end. Because of stop symbol on the Arduino side is newline char.
-
-        Args:
-            json_dict (dict): The dictionary to convert to a json string.
-
-        Returns:
-            str: The json string.
-    """
-    json_string = str(json_dict).replace("\n", "").replace("\"", "'")
-    return json_string + "\n"
-
-
 if __name__ == "__main__":
     pass
