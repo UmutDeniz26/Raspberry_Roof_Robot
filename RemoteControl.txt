@@ -3,3 +3,10 @@ sudo service xrdp start | stop | restart | status
 
 //To see host IP
 hostname -I
+
+//To find rasp IP
+nmap -sn 192.168.1.0/24
+
+//Wifi connection
+nmcli device wifi list
+sudo nmcli device wifi connect <SSID> password <password>
