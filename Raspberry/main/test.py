@@ -15,28 +15,18 @@ test_data_array = [
     "{\"Type\": \"robot_move\", \"Command\": \"left\"}",
     "{\"Type\": \"robot_move\", \"Command\": \"right\"}",
     "{\"Type\": \"robot_move\", \"Command\": \"stop\"}",
-    "{\"Type\": \"gps\",\"Command\": \"get_data\"}"
+    #"{\"Type\": \"gps\",\"Command\": \"get_data\"}"
 ]
 
-# Function to calculate bit length of a string
-def bit_length(s):
-    return len(s.encode('utf-8')) * 8
-
-#test_data_array = ["{\"data\":"+str(i)+"}" for i in range(test_data_len)]
-test_data_len = len(test_data_array)
-
-total_bit_length = sum(bit_length(data) for data in test_data_array)
-avg_bit_length = total_bit_length / test_data_len
+avg_bit_length = sum([ sys.getsizeof(data) for data in test_data_array ]) / len(test_data_array)
 print("Average bit size of test_data_array:", avg_bit_length, "bits")
 
 
-      
 # Sends message to the server
 def send_message_to_server(loop_cnt=1):
     print(f"Connected to {HOST}:{PORT}")
 
     timer = Timer()
-
     hold_data = 0
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
@@ -44,11 +34,12 @@ def send_message_to_server(loop_cnt=1):
 
             timer.start_new_timer("send_message_to_server")
 
-            message = test_data_array[i % len(test_data_array)]
+            message = test_data_array[i % len(test_data_array)]# if i %2 == 0 else test_data_array[-1]
             s.sendall(message.encode('utf-8'))
             data = s.recv(1024).decode('utf-8')
+            print(f"\nSent data: {message}")
             print(f"Received data: {data}")
-            time.sleep(5)
+            time.sleep(0.8)
 
             """
             if (hold_data+1)%test_data_len != json.loads(data)["data"] and hold_data != 0:
@@ -62,5 +53,5 @@ def send_message_to_server(loop_cnt=1):
 
 
 if __name__ == "__main__":
-    send_message_to_server(100)
+    send_message_to_server(50)
     
