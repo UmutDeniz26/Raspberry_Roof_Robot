@@ -79,18 +79,13 @@ void loop() {
         // Read the incoming data *Note: Our stop character is '\n'
         data = Serial.readStringUntil('\n');
         
-        // Verify that the data was received and parsed successfully
-        // Access JSON data here
-        String type = "";
-        String command = "";
-        
         // Check the type of command
         if (data[0] == '0'){ 
             motor_controller(data, 255);
             return_output = "{\"robot_move\": "+ data +"}";
             hold_last_movement = currentTime;
         }
-        else if(data == '1111'){
+        else if(data == "1111"){
             GPS_data = readGPSData();
             return_output = "{\"gps\": "+GPS_data+"}";   
         }
@@ -205,6 +200,11 @@ String readGPSData()
     // Break if time exceeds max_serial_time
     if (millis() - start_time > max_serial_time) {break;}
     c = gpsSerial.read();
+
+    if(c == '\n'){
+      c = "\\";
+    }
+    
     gpsData += c;
     delay(5); // Small delay to allow the buffer to fill
   }
