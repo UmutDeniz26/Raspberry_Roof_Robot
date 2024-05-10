@@ -51,7 +51,7 @@ void setup() {
   pinMode(in4, OUTPUT);
 
   gpsSerial.begin(9600);
-  Serial.begin(115200);
+  Serial.begin(14400);
 
   /*
   // Initialize MPU6050
