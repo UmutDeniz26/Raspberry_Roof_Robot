@@ -36,10 +36,8 @@ class Raspberry_Server:
         # Create a socket object
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        # The one liner : bind() to own address, connect() to remote address.
+        # The one liner : bind() to own address, connect() to remote address. 
         self.socket.bind((HOST, PORT))
-        
-        # Listen for incoming connections
         self.socket.listen()
         
         print(f"Server is listening on {self.HOST}:{self.PORT}...")
@@ -47,45 +45,39 @@ class Raspberry_Server:
     def init_serial_port(self):
         self.ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
 
-    def send_str_message_on_socket(self, message: str) -> None:
-        self.socket.sendall(message.encode('utf-8'))
-
-    def send_str_message_on_serial_port(self, message: str) -> None:
-        self.ser.write(message.encode('utf-8'))
-
-    def transmit_receive_arduino(self, message_dict: dict) -> str:
+    def transmit_receive_arduino(self, message_raw) -> str:
         """
             Send a message to the Arduino and receive a response.
 
             Args:
-                message_dict (dict): The message to send to the Arduino.
+                message_raw (Dynamic): The message to send to the Arduino.
                 time_out_limit (int): The time out limit for the response.
 
             Returns:
                 str: The response from the Arduino.
         """
 
-        if type(message_dict) == dict:
-            message = Common.json_dict_to_string(message_dict)
-        elif "\n" not in message:
+        if type(message_raw) == dict:
+            message = Common.dict_to_bit(message_raw) + "\n"  
+            print("Message information: ",message, " Type: ", type(message), " Size: ", sys.getsizeof(message))
+        
+        if type(message) != str:
+            return "{'error': 'Message must be a string.'}"
+        elif message[-1] != "\n":
             return "{'error': 'Message must end with a newline character.'}"
-    
+
         self.ser.reset_input_buffer()
         hold = time.time()
         while True:
-            
             # Send the message to the Arduino
-            message = Common.dict_to_bit(message_dict) + "\n"
-            # print(message, " Type: ", type(message), " Size: ", sys.getsizeof(message))
-
-            self.send_str_message_on_serial_port(message) 
+            self.ser.write(message.encode('utf-8'))
 
             if self.WAIT_REPONSE_FROM_ARDUINO:
                 line = self.ser.readline().decode('utf-8').rstrip()
                 if line:
                     return line
                 elif time.time() - hold > self.WAIT_REPONSE_TIMEOUT_LIMIT:
-                    return "{'error': 'Timeout limit reached.'}"
+                    return "{'information': 'Timeout limit reached.'}"
             elif math.fabs(time.time() - hold) > 0.7:
                 return "{'information': 'Waiting for response is disabled.'}"
 
@@ -112,15 +104,13 @@ class Raspberry_Server:
                     # Send the data back to the client ( Optional ) ( Echo server )
                     conn.sendall(data_received) if self.ECHO_SERVER else None
 
-                    # Decode the data
+                    # Decode the data and convert to json dict.
                     data_received_string = data_received.decode('utf-8')
-
-                    # Encode as JSON
-                    json_data = Common.str_to_json_dict(data_received_string)
+                    transmit_data = Common.str_to_json_dict(data_received_string)
                     
                     # Sending the message to the Arduino
                     time_start = time.time()
-                    response_from_arduino = self.transmit_receive_arduino( json_data )
+                    response_from_arduino = self.transmit_receive_arduino( transmit_data )
                     print(f"Time taken to send and receive data from Arduino: {time.time() - time_start}")
                     
                     # Print the response
