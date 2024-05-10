@@ -11,7 +11,7 @@ import time
 sys.path.insert(0,".")
 from Utils.timer import Timer
 
-HOST = "192.168.1.13"
+HOST = "192.168.1.89"
 PORT = 5000
 
 test_data_array = [
@@ -41,10 +41,10 @@ def send_message_to_server(loop_cnt=1):
 
             message = test_data_array[i % len(test_data_array)]# if i %2 == 0 else test_data_array[-1]
             s.sendall(message.encode('utf-8'))
-            data = s.recv(1024).decode('utf-8')
+            #data = s.recv(1024).decode('utf-8')
             print(f"\nSent data: {message}")
-            print(f"Received data: {data}")
-            time.sleep(0.8)
+            #print(f"Received data: {data}")
+            time.sleep(2)
 
             """
             if (hold_data+1)%test_data_len != json.loads(data)["data"] and hold_data != 0:
