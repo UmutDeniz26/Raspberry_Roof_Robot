@@ -21,7 +21,7 @@ test_data_array = [
     #"{\"Type\": \"robot_move\", \"Command\": \"left\"}",
     #"{\"Type\": \"robot_move\", \"Command\": \"right\"}",
     #"{\"Type\": \"robot_move\", \"Command\": \"stop\"}",
-    "{\"Type\": \"gps\",\"Command\": \"get_data\"}"
+    #"{\"Type\": \"gps\",\"Command\": \"get_data\"}"
 ]
 
 avg_bit_length = sum([ sys.getsizeof(data) for data in test_data_array ]) / len(test_data_array)
