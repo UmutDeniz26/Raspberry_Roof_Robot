@@ -3,6 +3,7 @@ import serial
 import math
 import time
 import sys
+import re
 
 sys.path.insert(0,"Raspberry")
 sys.path.insert(0,".")
@@ -48,7 +49,7 @@ class Raspberry_Server:
         print(f"Server is listening on {self.HOST}:{self.PORT}...")
 
     def init_serial_port(self):
-        self.ser = serial.Serial('/dev/ttyUSB0', 14400, timeout=2)
+        self.ser = serial.Serial('/dev/ttyUSB0', 14400, timeout=1)
 
     def transmit_receive_arduino(self, message_raw) -> str:
         """
@@ -63,13 +64,13 @@ class Raspberry_Server:
         """
 
         if type(message_raw) == dict:
-            message = Common.dict_to_bit(message_raw) + "\n"  
-            print("Message Type: ", type(message), " Size: ", sys.getsizeof(message) , " data : ", message.replace("\n", ""))
+            message_str = Common.dict_to_bit(message_raw) + "\n"  
+            print("Message_str Type: ", type(message_str), " Size: ", sys.getsizeof(message_str) , " data : ", message_str.replace("\n", ""))
 
-        if message[-1] != "\n":
+        if message_str[-1] != "\n":
             return "{'error': 'Message must end with a newline character.'}"
 
-        message = message.encode('utf-8')
+        message = message_str.encode('utf-8')
         
         if type(message) != bytes:
             return "{'error': 'Message must be a byte.'}"
@@ -83,10 +84,19 @@ class Raspberry_Server:
             self.ser.write(message)
 
             if self.WAIT_REPONSE_FROM_ARDUINO:
-                line = self.ser.readline().decode('utf-8').rstrip()
+                # Wait for a response from the Arduino
+                try:
+                    line = self.ser.readline().decode('utf-8').rstrip()
+                except UnicodeDecodeError:
+                    return "{'error': 'UnicodeDecodeError'}"
+                
+                # Check if the response is not empty
                 if line:
-                    print(line)
+                    # Remove special characters before returning the response
+                    line = re.sub('[^a-zA-Z0-9\.,*$]', '', line) if message_str == "1111\n" else line
                     return line
+                
+                # Check if the time out limit is reached
                 elif time.time() - hold > self.WAIT_REPONSE_TIMEOUT_LIMIT:
                     return "{'information': 'Timeout limit reached.'}"
             elif math.fabs(time.time() - hold) > 0.7:
@@ -109,7 +119,6 @@ class Raspberry_Server:
                         data_received = conn.recv(1024) # 1024 is the buffer size in bytes
                         if not data_received:
                             break
-
                         self.timer.start_new_timer("end_to_end_time")
                     except ConnectionResetError:
                         print("Connection was reset by the client")
