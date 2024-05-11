@@ -48,7 +48,15 @@ class Raspberry_Server:
         
         print(f"Server is listening on {self.HOST}:{self.PORT}...")
 
+    def reset_serial_port(self):
+        
+        if hasattr(self, "ser") and self.ser is not None:
+            self.ser.close()
+            self.ser = None
+        serial.Serial('/dev/ttyUSB0', 14400, timeout=1).close()
+        
     def init_serial_port(self):
+        self.reset_serial_port()
         try:
             self.ser = serial.Serial('/dev/ttyUSB0', 14400, timeout=1)
         except serial.serialutil.SerialException:
@@ -69,7 +77,9 @@ class Raspberry_Server:
 
         if type(message_raw) == dict:
             message_str = Common.dict_to_bit(message_raw) + "\n"  
-            print("Message_str Type: ", type(message_str), " Size: ", sys.getsizeof(message_str) , " data : ", message_str.replace("\n", ""))
+        else:
+            message_str = message_raw
+        print("Message_str Type: ", type(message_str), " Size: ", sys.getsizeof(message_str) , " data : ", message_str.replace("\n", ""))
 
         if message_str[-1] != "\n":
             return "{'error': 'Message must end with a newline character.'}"
@@ -137,7 +147,10 @@ class Raspberry_Server:
 
                     # Decode the data and convert to json dict.
                     data_received_string = data_received.decode('utf-8')
-                    transmit_data = Common.str_to_json_dict(data_received_string)
+                    if data_received_string[-1] == "}":
+                        transmit_data = Common.str_to_json_dict(data_received_string)
+                    else:
+                        transmit_data = data_received_string
                     
                     # Sending the message to the Arduino
                     response_from_arduino = self.transmit_receive_arduino( transmit_data )
@@ -155,7 +168,7 @@ class Raspberry_Server:
             Destructor. Closes the socket and serial port.
         """
         self.socket.close()
-        if self.ser is not None:
+        if hasattr(self, "ser") and self.ser is not None:
             self.ser.close()
 
 
