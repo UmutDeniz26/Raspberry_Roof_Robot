@@ -18,8 +18,8 @@ PORT = 5000
 test_data_array = [
     "{\"Type\": \"robot_move\", \"Command\": \"forward\"}",
     "{\"Type\": \"robot_move\", \"Command\": \"backward\"}",
-    #"{\"Type\": \"robot_move\", \"Command\": \"left\"}",
-    #"{\"Type\": \"robot_move\", \"Command\": \"right\"}",
+    "{\"Type\": \"robot_move\", \"Command\": \"left\"}",
+    "{\"Type\": \"robot_move\", \"Command\": \"right\"}",
     #"{\"Type\": \"robot_move\", \"Command\": \"stop\"}",
     #"{\"Type\": \"gps\",\"Command\": \"get_data\"}"
 ]
@@ -34,8 +34,12 @@ def send_message_to_server(loop_cnt=1):
 
     timer = Timer()
     hold_data = 0
+    DELAY_INIT = 2
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
+        start_time = time.time()
+
         for i in range(loop_cnt):
 
             timer.start_new_timer("send_message_to_server")
@@ -45,7 +49,11 @@ def send_message_to_server(loop_cnt=1):
             data = s.recv(2048).decode('utf-8')
             print(f"\nSent data: {message}")    
             print("Received data: ",data)
-            time.sleep(0.1)
+    
+            delay = DELAY_INIT / 2** (( time.time() - start_time )/8)
+            print("Delay: ", delay, "    Time: ", time.time() - start_time)
+
+            time.sleep( delay )
 
             """
             # To test the data integrity
