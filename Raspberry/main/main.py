@@ -49,8 +49,12 @@ class Raspberry_Server:
         print(f"Server is listening on {self.HOST}:{self.PORT}...")
 
     def init_serial_port(self):
-        self.ser = serial.Serial('/dev/ttyUSB0', 14400, timeout=1)
-
+        try:
+            self.ser = serial.Serial('/dev/ttyUSB0', 14400, timeout=1)
+        except serial.serialutil.SerialException:
+            print("Serial port is not available. Please check the connection.")
+            self.ser = None
+            
     def transmit_receive_arduino(self, message_raw) -> str:
         """
             Send a message to the Arduino and receive a response.
@@ -107,6 +111,10 @@ class Raspberry_Server:
         """
             Wait for a connection from a client and send a message to the client.
         """
+        if self.ser is None:
+            print("Serial port is not available. Exiting the program.")
+            return
+
         while True:
             conn, addr = self.socket.accept()
             with conn:
@@ -147,7 +155,8 @@ class Raspberry_Server:
             Destructor. Closes the socket and serial port.
         """
         self.socket.close()
-        self.ser.close()
+        if self.ser is not None:
+            self.ser.close()
 
 
 def main():
@@ -161,4 +170,8 @@ def main():
     del server
 
 if __name__ == "__main__":
-    main()
+
+    try:
+        main()
+    except AttributeError:
+        print("An AttributeError occurred.")
