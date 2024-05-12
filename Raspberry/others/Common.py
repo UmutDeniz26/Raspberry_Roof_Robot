@@ -28,6 +28,27 @@ def json_dict_to_string(json_dict: dict) -> str:
     json_string = str(json_dict).replace("\n", "").replace("\"", "'")
     return json_string
 
+def convert_message_to_bytes(message) -> bytes:
+    """
+        Convert a message to bytes.
+        
+        Args:
+            message (str or dict): The message to convert to bytes.
+        
+        Returns:
+            output (bytes): The message converted to bytes.
+    """
+    if type(message) == dict:
+        output = dict_to_bit(message) + "\n"
+    elif type(message) == str and message[-1] == "\n":
+        output = message.encode('utf-8')
+    else:
+        return "{'error': 'Message must be str or dict. If it is a str, it must end with a newline character.'}", False
+
+    return output, True
+
+
+
 
 BIT_MAP = {
     "robot_move-forward": "0000",

@@ -20,6 +20,9 @@ class Raspberry_Server:
                 , serial_port_baud_rate: int, serial_port_device:str         
         ) -> None:
         
+        # Initialize attributes
+        self.ser = None
+        
         # Set attributes
         self.ECHO_SERVER = echo_server # Echo server -> Sends the data back to the client
         self.WAIT_REPONSE_FROM_ARDUINO = wait_response # Wait for a response from the Arduino
@@ -40,9 +43,11 @@ class Raspberry_Server:
         """
             Print the features of the server.
         """
-        print(f"Serving on {self.HOST}:{self.PORT}")
-        print(f"Serial port status:","Active" if self.ser is not None else "Inactive")
-        print(f"Serial port on {self.SERIAL_PORT_DEVICE} with baud rate {self.SERIAL_PORT_BAUD_RATE}")
+        print("\nServer features:")   
+        print(f"  Serving on {self.HOST}:{self.PORT}")
+        print(f"  Serial port status:","Active" if self.ser is not None else "Inactive")
+        print(f"  Serial port on {self.SERIAL_PORT_DEVICE} with baud rate {self.SERIAL_PORT_BAUD_RATE}")
+        print()
 
     def init_server(self,HOST: int, PORT: int) -> None:
         """
@@ -72,8 +77,8 @@ class Raspberry_Server:
             self.ser = serial.Serial( baudrate=baud_rate, port=dev , timeout=1)
         except Exception as e:
             print("Serial port is not available. Please check the connection: ", e)
-            self.ser = None
             
+
     def transmit_receive_arduino(self, message_raw) -> str:
         """
             Send a message to the Arduino and receive a response.
@@ -86,41 +91,35 @@ class Raspberry_Server:
                 str: The response from the Arduino.
         """
 
-        if not hasattr(self,"ser") or self.ser == None:
+        # First check if the serial port is available
+        if self.ser == None:
             return "{'error':'Serial port is not available.'}"
 
-        if type(message_raw) == dict:
-            message_str = Common.dict_to_bit(message_raw) + "\n"  
-        else:
-            message_str = message_raw
-        print("Message_str Type: ", type(message_str), " Size: ", sys.getsizeof(message_str) , " data : ", message_str.replace("\n", ""))
-
-        if message_str[-1] != "\n":
-            return "{'error': 'Message must end with a newline character.'}"
-
-        message = message_str.encode('utf-8')
+        # Encode the message to bytes. If the message is not a string or a dictionary, return an error message.
+        message, success = Common.convert_message_to_bytes(message_raw)
+        if not success:
+            return message
         
-        if type(message) != bytes:
-            return "{'error': 'Message must be a byte.'}"
-        
+        print("Raw Message Type: ", type(message_raw), " Size: ", sys.getsizeof(message_raw) , " data : ", message_raw.replace("\n", ""))        
         print("Encoded Message Type: ", type(message), " Size: ", sys.getsizeof(message) , " data : ", message)
+        
         self.ser.reset_input_buffer()
         hold = time.time()
+        
         while True:
             # Send the message to the Arduino
             self.ser.write(message)
 
+            # Wait for a response from the Arduino
             if self.WAIT_REPONSE_FROM_ARDUINO:
-                # Wait for a response from the Arduino
                 try:
                     line = self.ser.readline().decode('utf-8').rstrip()
                 except UnicodeDecodeError:
                     return "{'error': 'UnicodeDecodeError'}"
                 
-                # Check if the response is not empty
                 if line:
-                    # Remove special characters before returning the response
-                    line = re.sub('[^a-zA-Z0-9\.,*$]', '', line) if message_str == "1111\n" else line
+                    # Remove special characters before returning the response if the message is a gps message
+                    line = re.sub('[^a-zA-Z0-9\.,*$]', '', line) if message_raw == "1111\n" else line
                     return line
                 
                 # Check if the time out limit is reached
@@ -132,7 +131,7 @@ class Raspberry_Server:
 
     def main_loop(self) -> None:
         """
-            Wait for a connection from a client and send a message to the client.
+            The main loop of the server.
         """
         try:
 
@@ -181,7 +180,7 @@ class Raspberry_Server:
             Destructor. Closes the socket and serial port.
         """
         self.socket.close()
-        if hasattr(self,"ser") and self.ser is not None:
+        if self.ser is not None:
             self.ser.close()
 
 
