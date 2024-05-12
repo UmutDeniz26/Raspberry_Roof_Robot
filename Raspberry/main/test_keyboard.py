@@ -6,19 +6,15 @@ import re
 import keyboard
 
 HOST = "192.168.1.89"
-PORT = 5000
+PORT = 5001
 
-test_data_array = [
-    "{\"Type\": \"robot_move\", \"Command\": \"forward\"}",
-    "{\"Type\": \"robot_move\", \"Command\": \"backward\"}",
-    "{\"Type\": \"robot_move\", \"Command\": \"left\"}",
-    "{\"Type\": \"robot_move\", \"Command\": \"right\"}",
-    "{\"Type\": \"robot_move\", \"Command\": \"stop\"}",
-    #"{\"Type\": \"gps\",\"Command\": \"get_data\"}"
-]
+speed = 255
 
+def dict_creater(type_, command, value):
+    return "{\"Type\": \"" + type_ + "\", \"Command\": \"" + command + "\", \"Value\": " + str(value) + "}\n"
 
 def main():
+    global speed
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         print(f"Connected to {HOST}:{PORT}")
@@ -29,28 +25,47 @@ def main():
         while True:
 
             #Get keyboard key
-            if keyboard.is_pressed('w'):
-                message = test_data_array[0]
+
+            if keyboard.is_pressed('+'):
+                message = "inc_speed"
+
+            elif keyboard.is_pressed('-'):
+                message = "dec_speed"
+
+            elif keyboard.is_pressed('w'):
+                message = dict_creater("robot_move", "forward", speed)
 
             elif keyboard.is_pressed('s'):
-                message = test_data_array[1]
+                message = dict_creater("robot_move", "backward", speed)
 
             elif keyboard.is_pressed('a'):
-                message = test_data_array[2]
+                message = dict_creater("robot_move", "left", speed)
 
             elif keyboard.is_pressed('d'):
-                message = test_data_array[3]
+                message = dict_creater("robot_move", "right", speed)
 
             elif keyboard.is_pressed('e'):
                 return
-            
             else:
-                message = test_data_array[4]
+                message = dict_creater("robot_move", "stop", speed)
 
             if message == last_message:
                 continue
 
             last_message = message
+                
+            if message == "dec_speed":
+                if speed-20 >= 0:
+                    speed -= 20
+                else:
+                    speed = 0                    
+                continue
+            elif message == "inc_speed":
+                if speed+20 <= 255:
+                    speed += 20
+                else:
+                    speed = 255
+                continue
 
             s.sendall(message.encode('utf-8'))
             data = s.recv(2048).decode('utf-8')

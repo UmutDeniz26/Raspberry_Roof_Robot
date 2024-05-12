@@ -24,6 +24,9 @@ def is_port_in_use(ip,port):
             if e.errno == errno.EADDRINUSE:
                 return True
             print("An error occurred other than the port being in use, error: ", e)
+        except Exception as e:
+            print(f"An error occurred while checking the port: {e}")
+            return False
     print(f"Port {port} is available")
     return False
 
@@ -59,9 +62,6 @@ def get_host_ip_and_port():
             tuple: The IP address and port of the Raspberry Pi.
     """
     ip_address = get_ip_address()
-
-    if ip_address is None:
-        raise Exception("Error getting IP address")
     
     init_port = 5000
 

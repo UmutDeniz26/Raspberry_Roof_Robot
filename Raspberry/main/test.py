@@ -16,12 +16,12 @@ HOST = "192.168.1.89"
 PORT = 5000
 
 test_data_array = [
-    "{\"Type\": \"robot_move\", \"Command\": \"forward\"}",
-    "{\"Type\": \"robot_move\", \"Command\": \"backward\"}",
-    "{\"Type\": \"robot_move\", \"Command\": \"left\"}",
-    "{\"Type\": \"robot_move\", \"Command\": \"right\"}",
-    #"{\"Type\": \"robot_move\", \"Command\": \"stop\"}",
-    #"{\"Type\": \"gps\",\"Command\": \"get_data\"}"
+    "{\"Type\": \"robot_move\", \"Command\": \"forward\", \"Value\": 255}",
+    "{\"Type\": \"robot_move\", \"Command\": \"backward\", \"Value\": 255}",
+    "{\"Type\": \"robot_move\", \"Command\": \"left\", \"Value\": 255}",
+    "{\"Type\": \"robot_move\", \"Command\": \"right\", \"Value\": 255}",
+    #"{\"Type\": \"robot_move\", \"Command\": \"stop\", \"Value\": 255}",
+    #"{\"Type\": \"gps\",\"Command\": \"get_data\", \"Value\": 0}",
 ]
 
 avg_bit_length = sum([ sys.getsizeof(data) for data in test_data_array ]) / len(test_data_array)
