@@ -91,7 +91,9 @@ class Raspberry_Server:
 
         if type(message_raw) == dict:
             message_str = Common.dict_to_bit(message_raw) + "\n"  
-            print("Message_str Type: ", type(message_str), " Size: ", sys.getsizeof(message_str) , " data : ", message_str.replace("\n", ""))
+        else:
+            message_str = message_raw
+        print("Message_str Type: ", type(message_str), " Size: ", sys.getsizeof(message_str) , " data : ", message_str.replace("\n", ""))
 
         if message_str[-1] != "\n":
             return "{'error': 'Message must end with a newline character.'}"
