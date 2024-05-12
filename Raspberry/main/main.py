@@ -158,8 +158,12 @@ class Raspberry_Server:
 
                         # Decode the data and convert to json dict.
                         data_received_string = data_received.decode('utf-8')
-                        transmit_data = Common.str_to_json_dict(data_received_string)
                         
+                        if data_received_string[-1] == "}":
+                            transmit_data = Common.str_to_json_dict(data_received_string)
+                        else:
+                            transmit_data = data_received_string
+
                         # Sending the message to the Arduino
                         response_from_arduino = self.transmit_receive_arduino( transmit_data )
                         conn.sendall(response_from_arduino.encode('utf-8'))
