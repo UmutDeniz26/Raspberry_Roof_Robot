@@ -5,8 +5,8 @@ import time
 import re
 import keyboard
 
-HOST = "192.168.1.89"
-PORT = 5001
+HOST = "192.168.1.13"
+PORT = 5000
 
 speed = 255
 
@@ -32,20 +32,24 @@ def main():
             elif keyboard.is_pressed('-'):
                 message = "dec_speed"
 
-            elif keyboard.is_pressed('w'):
+            elif keyboard.is_pressed('s'):
                 message = dict_creater("robot_move", "forward", speed)
 
-            elif keyboard.is_pressed('s'):
+            elif keyboard.is_pressed('w'):
                 message = dict_creater("robot_move", "backward", speed)
 
-            elif keyboard.is_pressed('a'):
+            elif keyboard.is_pressed('d'):
                 message = dict_creater("robot_move", "left", speed)
 
-            elif keyboard.is_pressed('d'):
+            elif keyboard.is_pressed('a'):
                 message = dict_creater("robot_move", "right", speed)
 
             elif keyboard.is_pressed('e'):
                 return
+            elif keyboard.is_pressed('g'):
+                #GPS
+                message = dict_creater("gps", "get", 0)
+                time.sleep(1)
             else:
                 message = dict_creater("robot_move", "stop", speed)
 
@@ -68,7 +72,10 @@ def main():
                 continue
 
             s.sendall(message.encode('utf-8'))
-            data = s.recv(2048).decode('utf-8')
+            data = s.recv(4096).decode('utf-8')
+            if message == dict_creater("gps", "get", 0):
+                s.sendall("\n".encode('utf-8'))
+                data += s.recv(4096).decode('utf-8')
 
             print(f"\nSent data: {message}")
             print("Received data: ", data)
