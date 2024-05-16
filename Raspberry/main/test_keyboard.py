@@ -49,7 +49,7 @@ def main():
             elif keyboard.is_pressed('g'):
                 #GPS
                 message = dict_creater("gps", "get", 0)
-                time.sleep(1)
+                time.sleep(0.2)
             else:
                 message = dict_creater("robot_move", "stop", speed)
 
