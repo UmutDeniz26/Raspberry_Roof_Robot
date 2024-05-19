@@ -63,16 +63,10 @@ def main():
             last_message = message
 
             if message == "dec_speed":
-                if speed - 20 >= 0:
-                    speed -= 20
-                else:
-                    speed = 0
+                speed = speed - 20 if speed - 20 >= 0 else 0
                 continue
             elif message == "inc_speed":
-                if speed + 20 <= 255:
-                    speed += 20
-                else:
-                    speed = 255
+                speed = speed + 20 if speed + 20 <= 255 else 255
                 continue
 
             s.sendall(message.encode('utf-8'))
