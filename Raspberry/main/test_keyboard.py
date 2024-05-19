@@ -15,15 +15,15 @@ def dict_creater(type_, command, value):
 
 def main():
     global speed
-
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         s.setblocking(False)  # Set the socket to non-blocking mode
         print(f"Connected to {HOST}:{PORT}")
-        print("Press 'w' to move forward, 's' to move backward, 'a' to move left, 'd' to move right, 'q' to stop.")
+        print("Press 'w' to move forward, 's' to move backward, 'a' to move left, 'd' to move right, 'e' to exit.")
         time.sleep(1)
 
         last_message = ""
+        time_start = time.time()
         while True:
             message = None
             # Check for keyboard input
@@ -49,6 +49,15 @@ def main():
 
             if message == last_message:
                 time.sleep(0.05)
+
+                """
+                # Forward movement testing
+                """
+                if time.time() - time_start > 2:
+                    message = dict_creater("robot_move", "forward", speed)
+                    s.sendall(message.encode('utf-8'))
+                    time_start = time.time()
+                #"""
                 continue
 
             last_message = message
@@ -80,7 +89,4 @@ def main():
                 print("Received data: ", data)
 
 if __name__ == "__main__":
-    
-    timer_start = time.time()
     main()
-    print(f"Time elapsed: {time.time() - timer_start}")
