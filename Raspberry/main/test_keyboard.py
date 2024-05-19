@@ -15,6 +15,7 @@ def dict_creater(type_, command, value):
 
 def main():
     global speed
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         s.setblocking(False)  # Set the socket to non-blocking mode
@@ -79,4 +80,7 @@ def main():
                 print("Received data: ", data)
 
 if __name__ == "__main__":
+    
+    timer_start = time.time()
     main()
+    print(f"Time elapsed: {time.time() - timer_start}")
