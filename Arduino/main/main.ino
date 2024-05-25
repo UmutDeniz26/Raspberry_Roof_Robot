@@ -37,6 +37,9 @@ void right(int speed);
 void left(int speed);
 void backward(int speed);
 void stop();
+
+void detailed_direction_motor_control(float x, float y);
+
 String readGPSData();
 struct MPUData getMPUData();
 void printMPUData(MPUData data);
@@ -91,9 +94,16 @@ void loop() {
       
       // Check the type of command
       if (type == "robot_move"){
-        motor_controller(command, 255);
-        return_output = "{\"robot_move\": "+command +"}";
+        
+        // Get the speed, x and y values
+        float x = doc["X"];
+        float y = doc["Y"];
+
+        detailed_direction_motor_control(x, y);
+
+        return_output = "{\"X\": "+String(x)+", \"Y\": "+String(y)+", \"Speed\": "+String(speed)+"}";
         hold_last_movement = currentTime;
+
       }
       else if(type=="gps"){
         GPS_data = readGPSData();
@@ -126,24 +136,6 @@ void loop() {
   */
 }
 
-void motor_controller(String command, int speed){
-  if(command=="forward"){
-    forward(speed);
-  }
-  else if(command=="backward"){
-    backward(speed);
-  }
-  else if(command=="left"){
-    left(speed);
-  }
-  else if(command=="right"){
-    right(speed);
-  }
-  else if(command=="stop"){
-    stop();
-  }
-}
-
 void stop() {
   //STOP
   digitalWrite(in1, LOW);
@@ -151,6 +143,165 @@ void stop() {
   digitalWrite(in3, LOW);
   digitalWrite(in4, LOW);
 }
+
+void control_left_motor_forward(int speed){
+  
+  // if speed larger than 255, set it to 255
+  speed = speed > 255 ? 255 : speed; speed = speed < 0 ? 0 : speed;
+
+  //MOTOR_A COUNTERCLOCKWISE MAX SPEED
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  analogWrite(ena, speed);
+}
+
+void control_right_motor_forward(int speed){
+  
+  // if speed larger than 255, set it to 255
+  speed = speed > 255 ? 255 : speed; speed = speed < 0 ? 0 : speed;
+
+  //MOTOR_B CLOCKWISE MAX SPEED
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
+  analogWrite(enb, speed);
+}
+
+void control_left_motor_backward(int speed){
+  
+  // if speed larger than 255, set it to 255
+  speed = speed > 255 ? 255 : speed; speed = speed < 0 ? 0 : speed;
+
+  //MOTOR_A CLOCKWISE MAX SPEED
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  analogWrite(ena, speed);
+}
+
+void control_right_motor_backward(int speed){
+  
+  // if speed larger than 255, set it to 255
+  speed = speed > 255 ? 255 : speed; speed = speed < 0 ? 0 : speed;
+
+  //MOTOR_B COUNTERCLOCKWISE MAX SPEED
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
+  analogWrite(enb, speed);
+}
+
+// Move the robot in a detailed direction
+void detailed_direction_motor_control(float x, float y){
+  // X and Y are the coordinates of the joystick ( between -1 and 1 )
+  // Speed is the speed of the motors ( between 0 and 255 )
+  // The function will control the motors to move the robot in the direction of the joystick
+
+  int MIN_SPEED = 180;
+  int MAX_SPEED = 255;
+
+  int difference_min_max = MAX_SPEED - MIN_SPEED;
+
+  int MAX_SPEED_DIFF = difference_min_max * 1; // This coefficient can be adjusted to change the speed difference between the motors
+
+  int left_speed, right_speed;
+
+  // If the joystick is in the middle, stop the robot
+  if (x == 0 && y == 0){
+    stop();
+  }
+  // If the joystick is in the top right corner -> Forward Right
+  else if (x > 0 && y > 0){
+    // Calculate the speed of the left motor
+    left_speed  = MIN_SPEED + (difference_min_max * y) + (MAX_SPEED_DIFF/2 * x);
+
+    if (left_speed > 255){
+      left_speed = 255;
+      right_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF * x);
+    }
+    else{
+      // Calculate the speed of the right motor
+      right_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF/2 * x);
+    }
+    
+    // Control the left motor
+    control_left_motor_forward(left_speed);
+    // Control the right motor
+    control_right_motor_forward(right_speed);
+  }
+  // If the joystick is in the top left corner -> Forward Left
+  else if (x < 0 && y > 0){
+    // Calculate the speed of the left motor
+    right_speed = MIN_SPEED + (difference_min_max * y) + (MAX_SPEED_DIFF/2 * -x);
+
+    if (right_speed > 255){
+      right_speed = 255;
+      left_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF * -x);
+    }
+    else{
+      // Calculate the speed of the right motor
+      left_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF/2 * -x);
+    }
+
+    // Control the left motor
+    control_left_motor_forward(left_speed);
+    // Control the right motor
+    control_right_motor_forward(right_speed);
+  }
+  // If the joystick is in the bottom left corner -> Backward Left
+  else if (x < 0 && y < 0){
+    
+    // Calculate the speed of the right motor
+    right_speed = MIN_SPEED + (difference_min_max * -y) + (MAX_SPEED_DIFF/2 * -x);
+
+    if (right_speed > 255){
+      right_speed = 255;
+      left_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF * -x);
+    }
+    else{
+      // Calculate the speed of the left motor
+      left_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF/2 * -x);
+    }
+
+    // Control the left motor
+    control_left_motor_backward(left_speed);
+    // Control the right motor
+    control_right_motor_backward(right_speed);
+  }
+  // If the joystick is in the bottom right corner -> Backward Right
+  else if (x > 0 && y < 0){
+    // Calculate the speed of the left motor
+    left_speed = MIN_SPEED + (difference_min_max * -y) + (MAX_SPEED_DIFF/2 * x);
+
+    if (left_speed > 255){
+      left_speed = 255;
+      right_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF * x);
+    }
+    else{
+      // Calculate the speed of the right motor
+      right_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF/2 * x);
+    }
+    
+    // Control the left motor
+    control_left_motor_backward(left_speed);
+    // Control the right motor
+    control_right_motor_backward(right_speed);
+  }
+  else if( x == 0 ){
+    if( y > 0 ){
+      forward(speed);
+    }
+    else{
+      backward(speed);
+    }
+  }
+  else if( y == 0 ){
+    if( x > 0 ){
+      right(speed);
+    }
+    else{
+      left(speed);
+    }
+  }  
+}
+
 
 void forward(int speed) {
   //MOTOR_A CLOCKWISE MAX SPEED
@@ -200,27 +351,7 @@ void backward(int speed) {
   analogWrite(enb, speed);
 }
 
-String readGPSData()
-{
-  // Initialize variables
-  const int max_serial_time = 1000;
-  char c; String gpsData;
-  unsigned long start_time = millis();
-  
-  // Read GPS data if available
-  while (gpsSerial.available() > 0)
-  {
-    // Break if time exceeds max_serial_time
-    if (millis() - start_time > max_serial_time) {break;}
-    c = gpsSerial.read();
-    gpsData += c;
-    delay(5); // Small delay to allow the buffer to fill
-  }
 
-  return gpsData;
-}
-
-/*
 // Get MPU6050 readings
 MPUData getMPUData()
 {
@@ -262,7 +393,26 @@ void printMPUData(MPUData data)
   Serial.print(data.temp);
   Serial.print(" degC ---");
 }
-*/
+
+String readGPSData()
+{
+  // Initialize variables
+  const int max_serial_time = 1000;
+  char c; String gpsData;
+  unsigned long start_time = millis();
+  
+  // Read GPS data if available
+  while (gpsSerial.available() > 0)
+  {
+    // Break if time exceeds max_serial_time
+    if (millis() - start_time > max_serial_time) {break;}
+    c = gpsSerial.read();
+    gpsData += c;
+    delay(5); // Small delay to allow the buffer to fill
+  }
+
+  return gpsData;
+}
 
 /*
 Test request:

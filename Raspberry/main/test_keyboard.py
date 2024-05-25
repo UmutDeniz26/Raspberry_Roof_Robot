@@ -8,66 +8,54 @@ import select
 HOST = "192.168.1.13"
 PORT = 5000
 
-speed = 255
 
-def dict_creater(type_, command, value):
-    return "{\"Type\": \"" + type_ + "\", \"Command\": \"" + command + "\", \"Value\": " + str(value) + "}\n"
+def dict_creater(type_, command, value_list=[]):
+    ret = "{\"Type\": \"" + type_ + "\", \"Command\": \"" + command + "\","
+    for index, value in enumerate(value_list):
+        ret += f" \"Value{index+1}\": {value},"
+    ret = ret[:-1] + "}"
+    return ret
 
 def main():
-    global speed
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         s.setblocking(False)  # Set the socket to non-blocking mode
-        print(f"Connected to {HOST}:{PORT}")
+        print(f"Connected to {HOST}:{PORT}\n")
         print("Press 'w' to move forward, 's' to move backward, 'a' to move left, 'd' to move right, 'e' to exit.")
         time.sleep(1)
 
         last_message = ""
+        x = 0.0
+        y = 0.0
         time_start = time.time()
         while True:
             message = None
-            # Check for keyboard input
-            if keyboard.is_pressed('+'):
-                message = "inc_speed"
-            elif keyboard.is_pressed('-'):
-                message = "dec_speed"
-            elif keyboard.is_pressed('s'):
-                message = dict_creater("robot_move", "forward", speed)
+            
+            if keyboard.is_pressed('s'):
+                y = y-0.1 if y-0.1>-1 else -1.0
             elif keyboard.is_pressed('w'):
-                message = dict_creater("robot_move", "backward", speed)
+                y = y+0.1 if y+0.1<1 else 1.0
             elif keyboard.is_pressed('d'):
-                message = dict_creater("robot_move", "left", speed)
+                x = x+0.1 if x+0.1<1 else 1.0
             elif keyboard.is_pressed('a'):
-                message = dict_creater("robot_move", "right", speed)
+                x = x-0.1 if x-0.1>-1 else -1.0
             elif keyboard.is_pressed('e'):
                 return
             elif keyboard.is_pressed('g'):
-                message = dict_creater("gps", "get", 0)
+                message = dict_creater("gps", "get")
                 time.sleep(0.2)
             else:
-                message = dict_creater("robot_move", "stop", speed)
+                message = dict_creater("robot_move", "stop")
+
+            if message == None:
+                message = dict_creater("robot_move", "move", [x, y])
+                time.sleep(0.1)
 
             if message == last_message:
                 time.sleep(0.05)
-
-                """
-                # Forward movement testing
-                """
-                if time.time() - time_start > 2:
-                    message = dict_creater("robot_move", "forward", speed)
-                    s.sendall(message.encode('utf-8'))
-                    time_start = time.time()
-                #"""
                 continue
 
             last_message = message
-
-            if message == "dec_speed":
-                speed = speed - 20 if speed - 20 >= 0 else 0
-                continue
-            elif message == "inc_speed":
-                speed = speed + 20 if speed + 20 <= 255 else 255
-                continue
 
             s.sendall(message.encode('utf-8'))
             
