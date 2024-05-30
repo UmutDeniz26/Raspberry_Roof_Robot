@@ -117,6 +117,7 @@ class Raspberry_Server:
 
         # First check if the serial port is available
         if self.ser == None:
+            self.init_serial_port( self.SERIAL_PORT_BAUD_RATE, self.SERIAL_PORT_DEVICE )
             return "{'error':'Serial port is not available.'}"
 
         # Encode the message to bytes. If the message is not a string or a dictionary, return an error message.
@@ -184,12 +185,15 @@ class Raspberry_Server:
                     # Receive data from the client
                     while True:
                         data_received = self.get_message_from_client(conn)
+                        if data_received is None:
+                            continue
                         
                         # Send the data back to the client ( Optional ) ( Echo server )
                         conn.sendall(data_received) if self.ECHO_SERVER else None
 
                         # Decode the data and convert to json dict.
                         received_data_string = data_received.decode('utf-8')
+                        print(f"Data received from client: {received_data_string}")
                         
                         if received_data_string[-1] == "}":
                             received_data_dict = Common.str_to_json_dict(received_data_string)
