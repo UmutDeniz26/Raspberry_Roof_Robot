@@ -9,8 +9,8 @@ HOST = "192.168.19.243"
 PORT = 5001
 
 
-def dict_creater(type_, command, X=0.0, Y=0.0, speed=0.0):
-    ret = "{\"Type\": \"" + type_ + "\", \"Command\": \"" + command + "\"," + "\"X\": " + str(X) + ", \"Y\": " + str(Y) + ", \"Speed\": " + str(speed) + "}"
+def dict_creater(type_, command, X=0.0, Y=0.0):
+    ret = "{\"Type\": \"" + type_ + "\", \"Command\": \"" + command + "\"," + "\"X\": " + str(X) + ", \"Y\": " + str(Y) + "}"
     return ret
 
 def main():
@@ -51,7 +51,7 @@ def main():
                 message = dict_creater("robot_move", "stop")
 
             if message == None:
-                message = dict_creater("robot_move", "move", x, y, 255.0)
+                message = dict_creater("robot_move", "move", x, y)
                 time.sleep(0.1)
 
             if (hold_X == x and hold_Y == y) and hold_message == message:
