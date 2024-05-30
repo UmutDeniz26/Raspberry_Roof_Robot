@@ -4,6 +4,7 @@ import math
 import time
 import sys
 import traceback
+import re
 
 sys.path.insert(0,"Raspberry")
 sys.path.insert(0,".")
@@ -103,7 +104,7 @@ class Raspberry_Server:
 
         return message
 
-    def     transmit_receive_arduino(self, message_raw) -> str:
+    def transmit_receive_arduino(self, message_raw) -> str:
         """
             Send a message to the Arduino and receive a response.
 
@@ -133,13 +134,17 @@ class Raspberry_Server:
         print("Processed Message Type: ", type(message), " Size: ", sys.getsizeof(message) , " data : ", message)
         
         self.ser.reset_input_buffer()
+        self.ser.reset_output_buffer()
+        
         hold = time.time()
         
+
         while True:
             # Send the message to the Arduino
             print("Sending message to Arduino: ", message)
-            self.ser.write(message)
 
+            self.ser.write(message)
+        
             # Wait for a response from the Arduino
             if self.WAIT_REPONSE_FROM_ARDUINO:
                 try:
@@ -148,8 +153,11 @@ class Raspberry_Server:
                     return "{'error': 'UnicodeDecodeError'}"
                 
                 if line:
+
+                    #print("Response from Arduino Line withot strip: ", self.ser.readline().decode('utf-8'))
+                    #print("Response from Arduino Line: ", line)
                     # Remove special characters before returning the response if the message is a gps message
-                    #line = re.sub('[^a-zA-Z0-9\.,*$]', '', line) if message_raw == "1111\n" else line
+                    line = re.sub('[^a-zA-Z0-9}":{\.,*$]', '', line) if "gps" in message.decode('utf-8') else line
                     return line
                 
                 # Check if the time out limit is reached
