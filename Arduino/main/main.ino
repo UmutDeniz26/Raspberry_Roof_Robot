@@ -19,8 +19,8 @@ const unsigned long motor_time_out = 5000; // Interval for motor movements
 unsigned long previousTimeMPU = 0;
 const unsigned long mpuInterval = 5000; // Interval for MPU6050 readings
 
-int RXPin = 2;
-int TXPin = 3;
+int RXPin = 3;
+int TXPin = 2;
 SoftwareSerial gpsSerial(RXPin, TXPin);
 
 // Data structure for MPU6050 readings
@@ -412,7 +412,12 @@ String readGPSData()
     // Break if time exceeds max_serial_time
     if (millis() - start_time > max_serial_time) {break;}
     c = gpsSerial.read();
-    gpsData += c;
+    if (c == '\n') {
+      gpsData += " ";
+    }
+  else  {
+      gpsData += c;
+    }
     delay(5); // Small delay to allow the buffer to fill
   }
 
