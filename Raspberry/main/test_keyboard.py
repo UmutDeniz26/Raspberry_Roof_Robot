@@ -24,7 +24,7 @@ def main():
         last_message = ""
         x = 0.0
         y = 0.0
-        time_start = time.time()
+        
         while True:
             message = None
             
@@ -49,7 +49,7 @@ def main():
                 time.sleep(0.1)
 
             if message == last_message:
-                time.sleep(0.05)
+                time.sleep(0.1)
                 continue
 
             last_message = message

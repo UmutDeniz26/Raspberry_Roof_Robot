@@ -23,13 +23,13 @@ class Raspberry_Server:
         self.ser = None
         
         # Set attributes
-        self.ECHO_SERVER = echo_server # Echo server -> Sends the data back to the client
-        self.WAIT_REPONSE_FROM_ARDUINO = wait_response # Wait for a response from the Arduino
-        self.WAIT_REPONSE_TIMEOUT_LIMIT = time_out_limit # Time out limit for the response from the Arduino
-        self.TIME_MEASUREMENT = enable_time_measurement # Measures processing times
-        self.SERIAL_PORT_BAUD_RATE = serial_port_baud_rate # Baud rate
-        self.SERIAL_PORT_DEVICE = serial_port_device       # Connection device
-        self.SEND_ARD_BIT_OR_DICT = send_ard_bit_or_dict # Send the message as a bit or a dictionary
+        self.ECHO_SERVER = echo_server                      # Echo server -> Sends the data back to the client
+        self.WAIT_REPONSE_FROM_ARDUINO = wait_response      # Wait for a response from the Arduino
+        self.WAIT_REPONSE_TIMEOUT_LIMIT = time_out_limit    # Time out limit for the response from the Arduino
+        self.TIME_MEASUREMENT = enable_time_measurement     # Measures processing times
+        self.SERIAL_PORT_BAUD_RATE = serial_port_baud_rate  # Baud rate
+        self.SERIAL_PORT_DEVICE = serial_port_device        # Connection device
+        self.SEND_ARD_BIT_OR_DICT = send_ard_bit_or_dict    # Send the message as a bit or a dictionary
         
         self.init_server(HOST, PORT)
         self.init_serial_port( serial_port_baud_rate, serial_port_device )
@@ -96,8 +96,10 @@ class Raspberry_Server:
         else:
             if type(message_raw) == str:
                 message_raw = Common.str_to_json_dict(message_raw)
-            message = Common.convert_to_dict( message_raw["Command"], message_raw["Type"], message_raw["X"], message_raw["Y"], message_raw["Speed"] )
-            message = message.encode('utf-8')
+            message = Common.convert_to_dict(    
+                    message_raw["Command"], message_raw["Type"], message_raw["X"], message_raw["Y"], message_raw["Speed"]
+                ).encode('utf-8')
+
 
         return message
 
@@ -162,7 +164,7 @@ class Raspberry_Server:
             data_received = conn.recv(1024) # 1024 is the buffer size in bytes
             if not data_received:
                 return None
-            return data_received.decode('utf-8')
+            return data_received
         except ConnectionResetError:
             print("Connection was reset by the client")
             return None
@@ -202,7 +204,8 @@ class Raspberry_Server:
                         print(f"Data received from Arduino: {response_from_arduino} \n")
                         self.timer.stop_timer("end_to_end_time") if self.TIME_MEASUREMENT else None
                         
-                self.timer.print_timers() if self.TIME_MEASUREMENT else None
+                    self.timer.print_timers() if self.TIME_MEASUREMENT else None
+
         except Exception as e:
             print(f"An error occurred while running the server: {e}")    
 
