@@ -3,36 +3,46 @@ import time
 
 control = [5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10]
 
-servo = 22
+def main():
 
-GPIO.setmode(GPIO.BOARD)
+    servo = 22
 
-GPIO.setup(servo,GPIO.OUT)
-# in servo motor,
-# 1ms pulse for 0 degree (LEFT)
-# 1.5ms pulse for 90 degree (MIDDLE)
-# 2ms pulse for 180 degree (RIGHT)
+    GPIO.setmode(GPIO.BOARD)
 
-# so for 50hz, one frequency is 20ms
-# duty cycle for 0 degree = (1/20)*100 = 5%
-# duty cycle for 90 degree = (1.5/20)*100 = 7.5%
-# duty cycle for 180 degree = (2/20)*100 = 10%
+    GPIO.setup(servo,GPIO.OUT)
+    # in servo motor,
+    # 1ms pulse for 0 degree (LEFT)
+    # 1.5ms pulse for 90 degree (MIDDLE)
+    # 2ms pulse for 180 degree (RIGHT)
 
-p=GPIO.PWM(servo,50)# 50hz frequency
+    # so for 50hz, one frequency is 20ms
+    # duty cycle for 0 degree = (1/20)*100 = 5%
+    # duty cycle for 90 degree = (1.5/20)*100 = 7.5%
+    # duty cycle for 180 degree = (2/20)*100 = 10%
 
-p.start(2.5)# starting duty cycle ( it set the servo to 0 degree )
+    p=GPIO.PWM(servo,50)# 50hz frequency
+    p.start(2.5)# starting duty cycle ( it set the servo to 0 degree )
 
 
-try:
-       while True:
-           for x in range(11):
-             p.ChangeDutyCycle(control[x])
-             time.sleep(0.03)
-           
-           for x in range(9,0,-1):
-             p.ChangeDutyCycle(control[x])
-             time.sleep(0.03)
-           
-except KeyboardInterrupt:
-    GPIO.cleanup()
+    try:
+        while True:
+            turn_left(p)
+            time.sleep(1)
+            turn_right(p)
+            time.sleep(1)
+            
+    except KeyboardInterrupt:
+        GPIO.cleanup()
     
+def turn_left(servo):
+    for x in range(11):
+        servo.ChangeDutyCycle(control[x])
+        time.sleep(0.03)
+
+def turn_right(servo):
+    for x in range(9,0,-1):
+        servo.ChangeDutyCycle(control[x])
+        time.sleep(0.03)
+
+if __name__ == "__main__":
+    main()
