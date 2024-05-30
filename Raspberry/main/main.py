@@ -189,31 +189,33 @@ class Raspberry_Server:
                 
                 # Receive data from the client
                 while True:
-                    data_received = self.get_message_from_client(conn)
-                    if data_received is None:
-                        continue
-                    
-                    # Send the data back to the client ( Optional ) ( Echo server )
-                    conn.sendall(data_received) if self.ECHO_SERVER else None
+                    try:
+                        data_received = self.get_message_from_client(conn)
+                        if data_received is None:
+                            continue
+                        
+                        # Send the data back to the client ( Optional ) ( Echo server )
+                        conn.sendall(data_received) if self.ECHO_SERVER else None
 
-                    # Decode the data and convert to json dict.
-                    received_data_string = data_received.decode('utf-8').split("}")[0] + "}"
-                    print(f"Data received from client: {received_data_string}")
-                    
-                    if received_data_string[-1] == "}":
-                        received_data_dict = Common.str_to_json_dict(received_data_string)
-                        response_from_arduino = self.transmit_receive_arduino( received_data_dict )
-                    else:
-                        response_from_arduino = self.transmit_receive_arduino( received_data_string )
+                        # Decode the data and convert to json dict.
+                        received_data_string = data_received.decode('utf-8').split("}")[0] + "}"
+                        print(f"Data received from client: {received_data_string}")
+                        
+                        if received_data_string[-1] == "}":
+                            received_data_dict = Common.str_to_json_dict(received_data_string)
+                            response_from_arduino = self.transmit_receive_arduino( received_data_dict )
+                        else:
+                            response_from_arduino = self.transmit_receive_arduino( received_data_string )
 
-                    # Sending the message to the Client                        
-                    conn.sendall(response_from_arduino.encode('utf-8'))
-                    
-                    # Print the response
-                    print(f"Data received from Arduino: {response_from_arduino} \n")
-                    self.timer.stop_timer("end_to_end_time") if self.TIME_MEASUREMENT else None
-                    
-                self.timer.print_timers() if self.TIME_MEASUREMENT else None
+                        # Sending the message to the Client                        
+                        conn.sendall(response_from_arduino.encode('utf-8'))
+                        
+                        # Print the response
+                        print(f"Data received from Arduino: {response_from_arduino} \n")
+                        self.timer.stop_timer("end_to_end_time") if self.TIME_MEASUREMENT else None
+                        100/0
+                    except Exception as e:
+                        print(f"An error occurred while processing the data: {e.__context__}")
 
     def __del__(self) -> None:
         """
@@ -231,7 +233,7 @@ def main():
 
     server = Raspberry_Server( 
         wait_response=True, echo_server=False, time_out_limit=5 , HOST=HOST, PORT=PORT,
-        serial_port_baud_rate=19200,serial_port_device='/dev/ttyUSB0', enable_time_measurement=True, send_ard_bit_or_dict=False
+        serial_port_baud_rate=19200,serial_port_device='/dev/ttyUSB0', enable_time_measurement=False, send_ard_bit_or_dict=False
         )
     server.main_loop()
     del server

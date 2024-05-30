@@ -54,7 +54,7 @@ void setup() {
   pinMode(in4, OUTPUT);
 
   gpsSerial.begin(9600);
-  Serial.begin(14400);
+  Serial.begin(19200);
 
   /*
   // Initialize MPU6050
@@ -102,11 +102,10 @@ void loop() {
           // Get the speed, x and y values
           float x = doc["X"];
           float y = doc["Y"];
-          int speed = doc["Speed"];
 
-          detailed_direction_motor_control(x, y , speed);
+          detailed_direction_motor_control(x, y);
 
-          return_output = "{\"X\": "+String(x)+", \"Y\": "+String(y)+", \"Speed\": "+String(speed)+"}";
+          return_output = "{\"X\": "+String(x)+", \"Y\": "+String(y)+"}";
           hold_last_movement = currentTime;
         }
       }
@@ -194,7 +193,7 @@ void control_right_motor_backward(int speed){
 }
 
 // Move the robot in a detailed direction
-void detailed_direction_motor_control(float x, float y, int speed ){
+void detailed_direction_motor_control(float x, float y ){
   // X and Y are the coordinates of the joystick ( between -1 and 1 )
   // Speed is the speed of the motors ( between 0 and 255 )
   // The function will control the motors to move the robot in the direction of the joystick
@@ -291,18 +290,18 @@ void detailed_direction_motor_control(float x, float y, int speed ){
   }
   else if( x == 0 ){
     if( y > 0 ){
-      forward(speed);
+      forward(255);
     }
     else{
-      backward(speed);
+      backward(255);
     }
   }
   else if( y == 0 ){
     if( x > 0 ){
-      right(speed);
+      right(255);
     }
     else{
-      left(speed);
+      left(255);
     }
   }  
 }

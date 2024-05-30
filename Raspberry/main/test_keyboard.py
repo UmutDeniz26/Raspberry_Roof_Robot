@@ -6,7 +6,7 @@ import keyboard
 import select
 
 HOST = "192.168.19.243"
-PORT = 5000
+PORT = 5001
 
 
 def dict_creater(type_, command, X=0.0, Y=0.0, speed=0.0):
@@ -44,6 +44,8 @@ def main():
                 message = dict_creater("gps", "get")
                 time.sleep(0.2)
             elif keyboard.is_pressed('q'):
+                print("Exiting from the server...")
+                s.close()
                 return
             else:
                 message = dict_creater("robot_move", "stop")
