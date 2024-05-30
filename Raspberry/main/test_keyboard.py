@@ -29,21 +29,25 @@ def main():
 
         while True:
             message = None
+            key = ''
             
             if keyboard.is_pressed('s'):
                 y = y-0.1 if y-0.1>-1 else -1.0
+                key = 's'
             elif keyboard.is_pressed('w'):
                 y = y+0.1 if y+0.1<1 else 1.0
+                key = 'w'
             elif keyboard.is_pressed('d'):
                 x = x+0.1 if x+0.1<1 else 1.0
+                key = 'd'
             elif keyboard.is_pressed('a'):
                 x = x-0.1 if x-0.1>-1 else -1.0
-            elif keyboard.is_pressed('e'):
-                return
+                key = 'a'
             elif keyboard.is_pressed('g'):
+                key = 'g'
                 message = dict_creater("gps", "get")
-                time.sleep(0.2)
             elif keyboard.is_pressed('q'):
+                key = 'q'
                 print("Exiting from the server...")
                 s.close()
                 return
@@ -66,14 +70,14 @@ def main():
             hold_message = message
 
             s.sendall(message.encode('utf-8'))
+
+            if key == 'g':
+                time.sleep(1)
             
             # Wait for data with a timeout
             ready = select.select([s], [], [], 0.5)
             if ready[0]:
                 data = s.recv(4096).decode('utf-8')
-                if message == dict_creater("gps", "get", []):
-                    s.sendall("\n".encode('utf-8'))
-                    data += s.recv(4096).decode('utf-8')
 
                 print(f"\nSent data: {message}")
                 print("Received data: ", data)
