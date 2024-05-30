@@ -1,48 +1,26 @@
 import RPi.GPIO as GPIO
 import time
 
-control = [5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10]
+servoPIN = 18
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(servoPIN, GPIO.OUT)
 
-def main():
+pwm = GPIO.PWM(servoPIN, 50) 
+pwm.start(0)
 
-    servo = 22
+def setAngle(angle):
+    x = (1/180) * angle + 1
+    duty = x * 5
+    pwm.ChangeDutyCycle(duty)
 
-    GPIO.setmode(GPIO.BOARD)
-
-    GPIO.setup(servo,GPIO.OUT)
-    # in servo motor,
-    # 1ms pulse for 0 degree (LEFT)
-    # 1.5ms pulse for 90 degree (MIDDLE)
-    # 2ms pulse for 180 degree (RIGHT)
-
-    # so for 50hz, one frequency is 20ms
-    # duty cycle for 0 degree = (1/20)*100 = 5%
-    # duty cycle for 90 degree = (1.5/20)*100 = 7.5%
-    # duty cycle for 180 degree = (2/20)*100 = 10%
-
-    p=GPIO.PWM(servo,50)# 50hz frequency
-    p.start(2.5)# starting duty cycle ( it set the servo to 0 degree )
-
-
-    try:
-        while True:
-            turn_left(p)
-            time.sleep(1)
-            turn_right(p)
+try:
+    while True:
+        
+        for i in range(0, 181, 45):
+            print("angle = ", i)
+            setAngle(i)
             time.sleep(1)
             
-    except KeyboardInterrupt:
-        GPIO.cleanup()
-    
-def turn_left(servo):
-    for x in range(11):
-        servo.ChangeDutyCycle(control[x])
-        time.sleep(0.03)
-
-def turn_right(servo):
-    for x in range(9,0,-1):
-        servo.ChangeDutyCycle(control[x])
-        time.sleep(0.03)
-
-if __name__ == "__main__":
-    main()
+except KeyboardInterrupt:
+    pwm.stop()
+    GPIO.cleanup()
