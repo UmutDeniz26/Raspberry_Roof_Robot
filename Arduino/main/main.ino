@@ -98,8 +98,9 @@ void loop() {
         // Get the speed, x and y values
         float x = doc["X"];
         float y = doc["Y"];
+        int speed = doc["Speed"];
 
-        detailed_direction_motor_control(x, y);
+        detailed_direction_motor_control(x, y , speed);
 
         return_output = "{\"X\": "+String(x)+", \"Y\": "+String(y)+", \"Speed\": "+String(speed)+"}";
         hold_last_movement = currentTime;
@@ -189,7 +190,7 @@ void control_right_motor_backward(int speed){
 }
 
 // Move the robot in a detailed direction
-void detailed_direction_motor_control(float x, float y){
+void detailed_direction_motor_control(float x, float y, int speed ){
   // X and Y are the coordinates of the joystick ( between -1 and 1 )
   // Speed is the speed of the motors ( between 0 and 255 )
   // The function will control the motors to move the robot in the direction of the joystick
@@ -351,7 +352,7 @@ void backward(int speed) {
   analogWrite(enb, speed);
 }
 
-
+/*
 // Get MPU6050 readings
 MPUData getMPUData()
 {
@@ -413,7 +414,7 @@ String readGPSData()
 
   return gpsData;
 }
-
+*/
 /*
 Test request:
 {"Type": "robot_move", "Command": "forward"}
