@@ -54,7 +54,7 @@ void setup() {
   pinMode(in4, OUTPUT);
 
   gpsSerial.begin(9600);
-  Serial.begin(115200);
+  Serial.begin(14400);
 
   /*
   // Initialize MPU6050
@@ -94,17 +94,21 @@ void loop() {
       
       // Check the type of command
       if (type == "robot_move"){
-        
-        // Get the speed, x and y values
-        float x = doc["X"];
-        float y = doc["Y"];
-        int speed = doc["Speed"];
+        if (command == "stop"){
+          stop();
+          return_output = "{\"Command\": \"stop\"}";
+        }
+        else{
+          // Get the speed, x and y values
+          float x = doc["X"];
+          float y = doc["Y"];
+          int speed = doc["Speed"];
 
-        detailed_direction_motor_control(x, y , speed);
+          detailed_direction_motor_control(x, y , speed);
 
-        return_output = "{\"X\": "+String(x)+", \"Y\": "+String(y)+", \"Speed\": "+String(speed)+"}";
-        hold_last_movement = currentTime;
-
+          return_output = "{\"X\": "+String(x)+", \"Y\": "+String(y)+", \"Speed\": "+String(speed)+"}";
+          hold_last_movement = currentTime;
+        }
       }
       else if(type=="gps"){
         GPS_data = readGPSData();
@@ -394,6 +398,7 @@ void printMPUData(MPUData data)
   Serial.print(data.temp);
   Serial.print(" degC ---");
 }
+*/
 
 String readGPSData()
 {
@@ -414,7 +419,6 @@ String readGPSData()
 
   return gpsData;
 }
-*/
 /*
 Test request:
 {"Type": "robot_move", "Command": "forward"}

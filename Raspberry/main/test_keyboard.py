@@ -5,7 +5,7 @@ import re
 import keyboard
 import select
 
-HOST = "192.168.1.13"
+HOST = "192.168.19.243"
 PORT = 5000
 
 
@@ -21,10 +21,12 @@ def main():
         print("Press 'w' to move forward, 's' to move backward, 'a' to move left, 'd' to move right, 'e' to exit.")
         time.sleep(1)
 
-        last_message = ""
+        hold_message = ""
+        hold_X = 0.0
+        hold_Y = 0.0
         x = 0.0
         y = 0.0
-        
+
         while True:
             message = None
             
@@ -41,6 +43,8 @@ def main():
             elif keyboard.is_pressed('g'):
                 message = dict_creater("gps", "get")
                 time.sleep(0.2)
+            elif keyboard.is_pressed('q'):
+                return
             else:
                 message = dict_creater("robot_move", "stop")
 
@@ -48,11 +52,16 @@ def main():
                 message = dict_creater("robot_move", "move", x, y, 255.0)
                 time.sleep(0.1)
 
-            if message == last_message:
-                time.sleep(0.1)
+            if (hold_X == x and hold_Y == y) and hold_message == message:
+                time.sleep(0.03)
                 continue
+            else:
+                time.sleep(0.1)
+            print(f"X: {x}, Y: {y}", "Message: ", message)
 
-            last_message = message
+            hold_X = x
+            hold_Y = y
+            hold_message = message
 
             s.sendall(message.encode('utf-8'))
             
