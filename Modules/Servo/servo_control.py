@@ -1,28 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 
-
-melody = [
-  
-  # Dart Vader theme (Imperial March) - Star wars 
-  # Score available at https://musescore.com/user/202909/scores/1141521
-  # The tenor saxophone part was used
-  
-  5.0, 5.0, 5.0, 5.0, 5.0, 6.25, 6.25, 6.25, 6.25, 6.25, 6.25, 7.5, 10.0, 7.5,
-  5.0, 5.0, 5.0, 5.0, 5.0, 6.25, 6.25, 6.25, 6.25, 6.25, 6.25, 7.5, 10.0, 7.5,
-  5.0, 5.0, 5.0, 7.5, 5.0, 10.0,
-
-  5.0, 7.5, 5.0, 10.0, 7.5, 5.0, 5.0, 5.0, 7.5, 5.0, 10.0,
-  5.0, 5.0, 5.0, 7.5, 5.0, 10.0, 7.5, 5.0, 5.0, 5.0, 7.5, 5.0, 10.0,
-
-  5.0, 5.0, 5.0, 5.0, 6.25, 6.25, 6.25, 7.5, 10.0, 7.5,
-  5.0, 5.0, 5.0, 5.0, 5.0, 6.25, 6.25, 6.25, 6.25, 6.25, 6.25, 7.5, 10.0, 7.5,
-  5.0, 5.0, 5.0, 7.5, 5.0, 10.0,
-
-  5.0, 5.0, 5.0, 5.0, 6.25, 6.25, 6.25, 7.5, 10.0, 7.5,
-  5.0, 5.0, 5.0, 5.0, 5.0, 6.25, 6.25, 6.25, 6.25, 6.25, 6.25, 7.5, 10.0, 7.5,
-  5.0, 5.0, 5.0, 7.5, 5.0, 10.0,
-]
+control = [5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10]
 
 servo = 22
 
@@ -45,12 +24,15 @@ p.start(2.5)# starting duty cycle ( it set the servo to 0 degree )
 
 
 try:
-    while True:
-        for x in melody:
-            p.ChangeDutyCycle(x)
-            time.sleep(1.03)
-
-
+       while True:
+           for x in range(11):
+             p.ChangeDutyCycle(control[x])
+             time.sleep(0.03)
+           
+           for x in range(9,0,-1):
+             p.ChangeDutyCycle(control[x])
+             time.sleep(0.03)
+           
 except KeyboardInterrupt:
     GPIO.cleanup()
     
