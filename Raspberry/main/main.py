@@ -10,7 +10,6 @@ sys.path.insert(0,".")
 from Utils.timer import Timer
 from Raspberry.others import Stream_operations
 from others import Common
-from server_operations import Send_message as rasp
 
 class Raspberry_Server:
     """
@@ -100,7 +99,7 @@ class Raspberry_Server:
         if not success:
             return message
         
-        print("Raw Message Type: ", type(message_raw), " Size: ", sys.getsizeof(message_raw) , " data : ", message_raw.replace("\n", ""))        
+        print("Raw Message Type: ", type(message_raw), " Size: ", sys.getsizeof(message_raw) , " data : ", message_raw)        
         print("Encoded Message Type: ", type(message), " Size: ", sys.getsizeof(message) , " data : ", message)
         
         self.ser.reset_input_buffer()
