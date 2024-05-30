@@ -63,7 +63,7 @@ def main():
             ready = select.select([s], [], [], 0.5)
             if ready[0]:
                 data = s.recv(4096).decode('utf-8')
-                if message == dict_creater("gps", "get", 0):
+                if message == dict_creater("gps", "get", []):
                     s.sendall("\n".encode('utf-8'))
                     data += s.recv(4096).decode('utf-8')
 
