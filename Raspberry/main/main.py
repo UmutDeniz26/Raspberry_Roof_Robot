@@ -98,12 +98,12 @@ class Raspberry_Server:
                 message_raw = Common.str_to_json_dict(message_raw)
             message = Common.convert_to_dict(    
                     message_raw["Command"], message_raw["Type"], message_raw["X"], message_raw["Y"], message_raw["Speed"]
-                ).encode('utf-8')
+                )
 
 
         return message
 
-    def transmit_receive_arduino(self, message_raw) -> str:
+    def     transmit_receive_arduino(self, message_raw) -> str:
         """
             Send a message to the Arduino and receive a response.
 
@@ -119,9 +119,15 @@ class Raspberry_Server:
         if self.ser == None:
             self.init_serial_port( self.SERIAL_PORT_BAUD_RATE, self.SERIAL_PORT_DEVICE )
             return "{'error':'Serial port is not available.'}"
+        
 
         # Encode the message to bytes. If the message is not a string or a dictionary, return an error message.
         message = self.prepare_arduino_message(message_raw)
+
+        if type(message) == dict:
+            message = Common.dict_to_str(message).encode('utf-8')
+        elif type(message) == str:
+            message = message.encode('utf-8')
 
         print("Raw Message Type: ", type(message_raw), " Size: ", sys.getsizeof(message_raw) , " data : ", message_raw)
         print("Processed Message Type: ", type(message), " Size: ", sys.getsizeof(message) , " data : ", message)
@@ -131,6 +137,7 @@ class Raspberry_Server:
         
         while True:
             # Send the message to the Arduino
+            print("Sending message to Arduino: ", message)
             self.ser.write(message)
 
             # Wait for a response from the Arduino
@@ -142,7 +149,7 @@ class Raspberry_Server:
                 
                 if line:
                     # Remove special characters before returning the response if the message is a gps message
-                    line = re.sub('[^a-zA-Z0-9\.,*$]', '', line) if message_raw == "1111\n" else line
+                    #line = re.sub('[^a-zA-Z0-9\.,*$]', '', line) if message_raw == "1111\n" else line
                     return line
                 
                 # Check if the time out limit is reached
@@ -174,44 +181,39 @@ class Raspberry_Server:
         """
             The main loop of the server.
         """
-        try:
+        while True:
+            conn, addr = self.socket.accept()
+            with conn:
 
-            while True:
-                conn, addr = self.socket.accept()
-                with conn:
-
-                    print(f"Connected from {addr}")
+                print(f"Connected from {addr}")
+                
+                # Receive data from the client
+                while True:
+                    data_received = self.get_message_from_client(conn)
+                    if data_received is None:
+                        continue
                     
-                    # Receive data from the client
-                    while True:
-                        data_received = self.get_message_from_client(conn)
-                        if data_received is None:
-                            continue
-                        
-                        # Send the data back to the client ( Optional ) ( Echo server )
-                        conn.sendall(data_received) if self.ECHO_SERVER else None
+                    # Send the data back to the client ( Optional ) ( Echo server )
+                    conn.sendall(data_received) if self.ECHO_SERVER else None
 
-                        # Decode the data and convert to json dict.
-                        received_data_string = data_received.decode('utf-8')
-                        print(f"Data received from client: {received_data_string}")
-                        
-                        if received_data_string[-1] == "}":
-                            received_data_dict = Common.str_to_json_dict(received_data_string)
-                            response_from_arduino = self.transmit_receive_arduino( received_data_dict )
-                        else:
-                            response_from_arduino = self.transmit_receive_arduino( received_data_string )
+                    # Decode the data and convert to json dict.
+                    received_data_string = data_received.decode('utf-8').split("}")[0] + "}"
+                    print(f"Data received from client: {received_data_string}")
+                    
+                    if received_data_string[-1] == "}":
+                        received_data_dict = Common.str_to_json_dict(received_data_string)
+                        response_from_arduino = self.transmit_receive_arduino( received_data_dict )
+                    else:
+                        response_from_arduino = self.transmit_receive_arduino( received_data_string )
 
-                        # Sending the message to the Arduino                        
-                        conn.sendall(response_from_arduino.encode('utf-8'))
-                        
-                        # Print the response
-                        print(f"Data received from Arduino: {response_from_arduino} \n")
-                        self.timer.stop_timer("end_to_end_time") if self.TIME_MEASUREMENT else None
-                        
-                    self.timer.print_timers() if self.TIME_MEASUREMENT else None
-
-        except Exception as e:
-            print(f"An error occurred while running the server: {e}")    
+                    # Sending the message to the Client                        
+                    conn.sendall(response_from_arduino.encode('utf-8'))
+                    
+                    # Print the response
+                    print(f"Data received from Arduino: {response_from_arduino} \n")
+                    self.timer.stop_timer("end_to_end_time") if self.TIME_MEASUREMENT else None
+                    
+                self.timer.print_timers() if self.TIME_MEASUREMENT else None
 
     def __del__(self) -> None:
         """
@@ -229,15 +231,11 @@ def main():
 
     server = Raspberry_Server( 
         wait_response=True, echo_server=False, time_out_limit=5 , HOST=HOST, PORT=PORT,
-        serial_port_baud_rate=14400,serial_port_device='/dev/ttyUSB0', enable_time_measurement=True, send_ard_bit_or_dict=False
+        serial_port_baud_rate=19200,serial_port_device='/dev/ttyUSB0', enable_time_measurement=True, send_ard_bit_or_dict=False
         )
     server.main_loop()
     del server
     print("Server is closed")
 
 if __name__ == "__main__":
-
-    try:
-        main()
-    except AttributeError as e:
-        print("An AttributeError occurred while running the server: ", e)
+    main()

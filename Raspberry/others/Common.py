@@ -13,8 +13,23 @@ def str_to_json_dict( data_str: str ) -> dict:
     try:
         return json.loads(data_str)
     except:
-        raise ValueError("Error converting string to json dictionary.")
+        print("Error converting string to dictionary : ", data_str)
+        return {}
 
+def dict_to_str( data: dict ) -> str:
+    """
+        Convert a dictionary to a string.
+        
+        Args:
+            data (dict): The dictionary to convert to a string.
+        
+        Returns:
+            str: The string.
+    """
+    try:
+        return json.dumps(data) + "\n"
+    except:
+        raise ValueError("Error converting dictionary to string.")
 
 def convert_to_dict( Command, Type, X=None, Y=None, Speed=None ):
     """
