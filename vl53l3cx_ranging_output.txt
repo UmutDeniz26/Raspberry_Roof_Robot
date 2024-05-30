@@ -1,0 +1,199 @@
+{"initial_entry": "Clearing the old file"}
+{"initial_entry": "Ranging loop starts"}
+{"Count": 0, "#Objs": 0, "Objects": []}
+{"Count": 0, "#Objs": 0, "Objects": []}
+{"Count": 1, "#Objs": 1, "Objects": [{"status": 12, "D": 103, "S": 104960, "Signal": 24.30, "Ambient": 0.09}]}
+{"Count": 2, "#Objs": 1, "Objects": [{"status": 0, "D": 120, "S": 1508864, "Signal": 0.12, "Ambient": 0.09}]}
+{"Count": 3, "#Objs": 1, "Objects": [{"status": 0, "D": 211, "S": 2020352, "Signal": 0.14, "Ambient": 0.11}]}
+{"Count": 4, "#Objs": 1, "Objects": [{"status": 0, "D": 179, "S": 869376, "Signal": 0.33, "Ambient": 0.07}]}
+{"Count": 5, "#Objs": 1, "Objects": [{"status": 0, "D": 192, "S": 648192, "Signal": 0.52, "Ambient": 0.11}]}
+{"Count": 6, "#Objs": 1, "Objects": [{"status": 0, "D": 168, "S": 618496, "Signal": 0.71, "Ambient": 0.10}]}
+{"Count": 7, "#Objs": 1, "Objects": [{"status": 0, "D": 76, "S": 80384, "Signal": 70.05, "Ambient": 0.10}]}
+{"Count": 8, "#Objs": 1, "Objects": [{"status": 14, "D": -92, "S": 66048, "Signal": 302.77, "Ambient": 0.09}]}
+{"Count": 9, "#Objs": 1, "Objects": [{"status": 0, "D": 25, "S": 91136, "Signal": 47.38, "Ambient": 0.02}]}
+{"Count": 10, "#Objs": 1, "Objects": [{"status": 0, "D": 34, "S": 93696, "Signal": 30.05, "Ambient": 0.01}]}
+{"Count": 11, "#Objs": 1, "Objects": [{"status": 0, "D": 23, "S": 83968, "Signal": 71.19, "Ambient": 0.02}]}
+{"Count": 12, "#Objs": 1, "Objects": [{"status": 0, "D": 40, "S": 86528, "Signal": 20.79, "Ambient": 0.02}]}
+{"Count": 13, "#Objs": 1, "Objects": [{"status": 0, "D": 178, "S": 999424, "Signal": 0.23, "Ambient": 0.03}]}
+{"Count": 14, "#Objs": 0, "Objects": []}
+{"Count": 15, "#Objs": 0, "Objects": []}
+{"Count": 16, "#Objs": 2, "Objects": [{"status": 12, "D": 126, "S": 1137664, "Signal": 0.34, "Ambient": 0.09},
+                     {"status": 12, "D": 1546, "S": 2861056, "Signal": 0.16, "Ambient": 0.09}]}
+{"Count": 17, "#Objs": 1, "Objects": [{"status": 0, "D": 127, "S": 1177600, "Signal": 0.20, "Ambient": 0.14}]}
+{"Count": 18, "#Objs": 1, "Objects": [{"status": 0, "D": 153, "S": 1246720, "Signal": 0.25, "Ambient": 0.12}]}
+{"Count": 19, "#Objs": 1, "Objects": [{"status": 0, "D": 151, "S": 2072064, "Signal": 0.15, "Ambient": 0.12}]}
+{"Count": 20, "#Objs": 1, "Objects": [{"status": 0, "D": 166, "S": 1151488, "Signal": 0.27, "Ambient": 0.12}]}
+{"Count": 21, "#Objs": 1, "Objects": [{"status": 0, "D": 183, "S": 1164288, "Signal": 0.24, "Ambient": 0.15}]}
+{"Count": 22, "#Objs": 2, "Objects": [{"status": 0, "D": 142, "S": 891392, "Signal": 0.32, "Ambient": 0.12},
+                     {"status": 7, "D": 1534, "S": 2489344, "Signal": 0.08, "Ambient": 0.12}]}
+{"Count": 23, "#Objs": 1, "Objects": [{"status": 0, "D": 153, "S": 148992, "Signal": 14.73, "Ambient": 0.12}]}
+{"Count": 24, "#Objs": 1, "Objects": [{"status": 1, "D": 1690, "S": 4236800, "Signal": 0.13, "Ambient": 0.09}]}
+{"Count": 25, "#Objs": 0, "Objects": []}
+{"Count": 26, "#Objs": 1, "Objects": [{"status": 1, "D": 1578, "S": 3451904, "Signal": 0.17, "Ambient": 0.09}]}
+{"Count": 27, "#Objs": 0, "Objects": []}
+{"Count": 28, "#Objs": 0, "Objects": []}
+{"Count": 29, "#Objs": 0, "Objects": []}
+{"Count": 30, "#Objs": 0, "Objects": []}
+{"Count": 31, "#Objs": 0, "Objects": []}
+{"Count": 32, "#Objs": 2, "Objects": [{"status": 12, "D": 197, "S": 768000, "Signal": 0.31, "Ambient": 0.10},
+                     {"status": 12, "D": 1505, "S": 2525184, "Signal": 0.12, "Ambient": 0.10}]}
+{"Count": 33, "#Objs": 0, "Objects": []}
+{"Count": 34, "#Objs": 1, "Objects": [{"status": 12, "D": 1543, "S": 2919936, "Signal": 0.12, "Ambient": 0.11}]}
+{"Count": 35, "#Objs": 0, "Objects": []}
+{"Count": 36, "#Objs": 1, "Objects": [{"status": 12, "D": 140, "S": 1755648, "Signal": 0.18, "Ambient": 0.11}]}
+{"Count": 37, "#Objs": 1, "Objects": [{"status": 0, "D": 161, "S": 1829888, "Signal": 0.17, "Ambient": 0.15}]}
+{"Count": 38, "#Objs": 2, "Objects": [{"status": 0, "D": 174, "S": 843264, "Signal": 0.38, "Ambient": 0.10},
+                     {"status": 4, "D": 1839, "S": 2468864, "Signal": 0.15, "Ambient": 0.10}]}
+{"Count": 39, "#Objs": 1, "Objects": [{"status": 0, "D": 187, "S": 676352, "Signal": 0.51, "Ambient": 0.13}]}
+{"Count": 40, "#Objs": 0, "Objects": []}
+{"Count": 41, "#Objs": 0, "Objects": []}
+{"Count": 42, "#Objs": 2, "Objects": [{"status": 12, "D": 155, "S": 1390592, "Signal": 0.17, "Ambient": 0.11},
+                     {"status": 12, "D": 1487, "S": 2086912, "Signal": 0.09, "Ambient": 0.11}]}
+{"Count": 43, "#Objs": 1, "Objects": [{"status": 0, "D": 163, "S": 838656, "Signal": 0.51, "Ambient": 0.13}]}
+{"Count": 44, "#Objs": 1, "Objects": [{"status": 0, "D": 173, "S": 667136, "Signal": 0.54, "Ambient": 0.12}]}
+{"Count": 45, "#Objs": 1, "Objects": [{"status": 0, "D": 180, "S": 591872, "Signal": 0.70, "Ambient": 0.15}]}
+{"Count": 46, "#Objs": 2, "Objects": [{"status": 0, "D": 160, "S": 1109504, "Signal": 0.42, "Ambient": 0.09},
+                     {"status": 7, "D": 1602, "S": 2941952, "Signal": 0.14, "Ambient": 0.09}]}
+{"Count": 47, "#Objs": 1, "Objects": [{"status": 0, "D": 177, "S": 1303552, "Signal": 0.23, "Ambient": 0.12}]}
+{"Count": 48, "#Objs": 1, "Objects": [{"status": 0, "D": 167, "S": 1247232, "Signal": 0.22, "Ambient": 0.11}]}
+{"Count": 49, "#Objs": 1, "Objects": [{"status": 0, "D": 217, "S": 852480, "Signal": 0.22, "Ambient": 0.12}]}
+{"Count": 50, "#Objs": 1, "Objects": [{"status": 0, "D": 146, "S": 1138176, "Signal": 0.36, "Ambient": 0.09}]}
+{"Count": 51, "#Objs": 1, "Objects": [{"status": 0, "D": 180, "S": 1046528, "Signal": 0.29, "Ambient": 0.12}]}
+{"Count": 52, "#Objs": 2, "Objects": [{"status": 0, "D": 150, "S": 765952, "Signal": 0.39, "Ambient": 0.10},
+                     {"status": 7, "D": 1555, "S": 2032640, "Signal": 0.12, "Ambient": 0.10}]}
+{"Count": 53, "#Objs": 1, "Objects": [{"status": 0, "D": 188, "S": 812032, "Signal": 0.23, "Ambient": 0.12}]}
+{"Count": 54, "#Objs": 2, "Objects": [{"status": 0, "D": 151, "S": 655360, "Signal": 0.37, "Ambient": 0.10},
+                     {"status": 7, "D": 1549, "S": 1677824, "Signal": 0.12, "Ambient": 0.10}]}
+{"Count": 55, "#Objs": 1, "Objects": [{"status": 0, "D": 189, "S": 671232, "Signal": 0.23, "Ambient": 0.12}]}
+{"Count": 56, "#Objs": 2, "Objects": [{"status": 0, "D": 154, "S": 628224, "Signal": 0.35, "Ambient": 0.10},
+                     {"status": 7, "D": 1555, "S": 1358848, "Signal": 0.12, "Ambient": 0.10}]}
+{"Count": 57, "#Objs": 2, "Objects": [{"status": 0, "D": 190, "S": 578048, "Signal": 0.23, "Ambient": 0.12},
+                     {"status": 0, "D": 1589, "S": 2551296, "Signal": 0.06, "Ambient": 0.12}]}
+{"Count": 58, "#Objs": 1, "Objects": [{"status": 0, "D": 88, "S": 620544, "Signal": 0.44, "Ambient": 0.10}]}
+{"Count": 59, "#Objs": 2, "Objects": [{"status": 0, "D": 189, "S": 521728, "Signal": 0.22, "Ambient": 0.12},
+                     {"status": 7, "D": 1634, "S": 2687488, "Signal": 0.08, "Ambient": 0.12}]}
+{"Count": 60, "#Objs": 1, "Objects": [{"status": 0, "D": 87, "S": 605184, "Signal": 0.42, "Ambient": 0.10}]}
+{"Count": 61, "#Objs": 2, "Objects": [{"status": 0, "D": 191, "S": 495616, "Signal": 0.21, "Ambient": 0.12},
+                     {"status": 7, "D": 1644, "S": 2326016, "Signal": 0.09, "Ambient": 0.12}]}
+{"Count": 62, "#Objs": 1, "Objects": [{"status": 0, "D": 79, "S": 627712, "Signal": 0.41, "Ambient": 0.10}]}
+{"Count": 63, "#Objs": 2, "Objects": [{"status": 0, "D": 192, "S": 515584, "Signal": 0.20, "Ambient": 0.12},
+                     {"status": 7, "D": 1634, "S": 2110464, "Signal": 0.09, "Ambient": 0.12}]}
+{"Count": 64, "#Objs": 1, "Objects": [{"status": 0, "D": 66, "S": 646144, "Signal": 0.41, "Ambient": 0.09}]}
+{"Count": 65, "#Objs": 2, "Objects": [{"status": 0, "D": 189, "S": 438272, "Signal": 0.25, "Ambient": 0.12},
+                     {"status": 7, "D": 1650, "S": 2367488, "Signal": 0.08, "Ambient": 0.12}]}
+{"Count": 66, "#Objs": 1, "Objects": [{"status": 0, "D": 172, "S": 352768, "Signal": 1.61, "Ambient": 0.12}]}
+{"Count": 67, "#Objs": 1, "Objects": [{"status": 0, "D": 178, "S": 1025024, "Signal": 0.30, "Ambient": 0.12}]}
+{"Count": 68, "#Objs": 1, "Objects": [{"status": 0, "D": 161, "S": 1203200, "Signal": 0.33, "Ambient": 0.11}]}
+{"Count": 69, "#Objs": 1, "Objects": [{"status": 0, "D": 201, "S": 1118720, "Signal": 0.20, "Ambient": 0.14}]}
+{"Count": 70, "#Objs": 1, "Objects": [{"status": 0, "D": 177, "S": 1225728, "Signal": 0.25, "Ambient": 0.11}]}
+{"Count": 71, "#Objs": 0, "Objects": []}
+{"Count": 72, "#Objs": 1, "Objects": [{"status": 4, "D": 1805, "S": 2043904, "Signal": 0.10, "Ambient": 0.11}]}
+{"Count": 73, "#Objs": 0, "Objects": []}
+{"Count": 74, "#Objs": 0, "Objects": []}
+{"Count": 75, "#Objs": 0, "Objects": []}
+{"Count": 76, "#Objs": 1, "Objects": [{"status": 12, "D": 1674, "S": 2697728, "Signal": 0.17, "Ambient": 0.11}]}
+{"Count": 77, "#Objs": 1, "Objects": [{"status": 0, "D": 1531, "S": 2706944, "Signal": 0.08, "Ambient": 0.12}]}
+{"Count": 78, "#Objs": 2, "Objects": [{"status": 7, "D": 64, "S": 1722880, "Signal": 0.07, "Ambient": 0.11},
+                     {"status": 0, "D": 1602, "S": 1906176, "Signal": 0.17, "Ambient": 0.11}]}
+{"Count": 79, "#Objs": 1, "Objects": [{"status": 0, "D": 1514, "S": 2746880, "Signal": 0.07, "Ambient": 0.12}]}
+{"Count": 80, "#Objs": 2, "Objects": [{"status": 7, "D": 200, "S": 1814528, "Signal": 0.05, "Ambient": 0.10},
+                     {"status": 0, "D": 1646, "S": 1767936, "Signal": 0.20, "Ambient": 0.10}]}
+{"Count": 81, "#Objs": 1, "Objects": [{"status": 0, "D": 1533, "S": 2289152, "Signal": 0.07, "Ambient": 0.12}]}
+{"Count": 82, "#Objs": 1, "Objects": [{"status": 4, "D": 1827, "S": 2792960, "Signal": 0.23, "Ambient": 0.10}]}
+{"Count": 83, "#Objs": 1, "Objects": [{"status": 0, "D": 4571, "S": 2493952, "Signal": 0.07, "Ambient": 0.12}]}
+{"Count": 84, "#Objs": 1, "Objects": [{"status": 0, "D": 4148, "S": 2772992, "Signal": 0.23, "Ambient": 0.10}]}
+{"Count": 85, "#Objs": 1, "Objects": [{"status": 0, "D": 4575, "S": 2025472, "Signal": 0.07, "Ambient": 0.12}]}
+{"Count": 86, "#Objs": 1, "Objects": [{"status": 0, "D": 4153, "S": 2372608, "Signal": 0.23, "Ambient": 0.10}]}
+{"Count": 87, "#Objs": 1, "Objects": [{"status": 0, "D": 4637, "S": 1911296, "Signal": 0.09, "Ambient": 0.12}]}
+{"Count": 88, "#Objs": 1, "Objects": [{"status": 0, "D": 4169, "S": 2342400, "Signal": 0.23, "Ambient": 0.10}]}
+{"Count": 89, "#Objs": 1, "Objects": [{"status": 0, "D": 4640, "S": 2099712, "Signal": 0.09, "Ambient": 0.12}]}
+{"Count": 90, "#Objs": 1, "Objects": [{"status": 0, "D": 4185, "S": 2426880, "Signal": 0.23, "Ambient": 0.10}]}
+{"Count": 91, "#Objs": 2, "Objects": [{"status": 0, "D": 6381, "S": 1953792, "Signal": 0.04, "Ambient": 0.12},
+                     {"status": 7, "D": 1603, "S": 1950208, "Signal": 0.09, "Ambient": 0.12}]}
+{"Count": 92, "#Objs": 1, "Objects": [{"status": 4, "D": -381, "S": 2761728, "Signal": 0.24, "Ambient": 0.10}]}
+{"Count": 93, "#Objs": 2, "Objects": [{"status": 7, "D": 179, "S": 1794560, "Signal": 0.05, "Ambient": 0.12},
+                     {"status": 7, "D": 1611, "S": 1849344, "Signal": 0.09, "Ambient": 0.12}]}
+{"Count": 94, "#Objs": 1, "Objects": [{"status": 4, "D": -343, "S": 2847744, "Signal": 0.25, "Ambient": 0.10}]}
+{"Count": 95, "#Objs": 2, "Objects": [{"status": 7, "D": 190, "S": 1547776, "Signal": 0.04, "Ambient": 0.12},
+                     {"status": 7, "D": 1628, "S": 1764352, "Signal": 0.09, "Ambient": 0.12}]}
+{"Count": 96, "#Objs": 1, "Objects": [{"status": 4, "D": -359, "S": 2704384, "Signal": 0.26, "Ambient": 0.10}]}
+{"Count": 97, "#Objs": 2, "Objects": [{"status": 7, "D": 188, "S": 1554944, "Signal": 0.05, "Ambient": 0.12},
+                     {"status": 7, "D": 1631, "S": 1910784, "Signal": 0.09, "Ambient": 0.12}]}
+{"Count": 98, "#Objs": 1, "Objects": [{"status": 4, "D": -307, "S": 2630656, "Signal": 0.28, "Ambient": 0.10}]}
+{"Count": 99, "#Objs": 2, "Objects": [{"status": 7, "D": 191, "S": 1361920, "Signal": 0.06, "Ambient": 0.12},
+                     {"status": 7, "D": 1625, "S": 1953792, "Signal": 0.09, "Ambient": 0.12}]}
+{"Count": 100, "#Objs": 1, "Objects": [{"status": 4, "D": -222, "S": 2596352, "Signal": 0.27, "Ambient": 0.11}]}
+{"Count": 101, "#Objs": 2, "Objects": [{"status": 7, "D": 176, "S": 1565696, "Signal": 0.06, "Ambient": 0.12},
+                     {"status": 1, "D": 1722, "S": 3712000, "Signal": 0.10, "Ambient": 0.12}]}
+{"Count": 102, "#Objs": 1, "Objects": [{"status": 4, "D": -180, "S": 2575360, "Signal": 0.27, "Ambient": 0.10}]}
+{"Count": 103, "#Objs": 2, "Objects": [{"status": 7, "D": 171, "S": 1491968, "Signal": 0.06, "Ambient": 0.12},
+                     {"status": 7, "D": 1550, "S": 2450432, "Signal": 0.05, "Ambient": 0.12}]}
+{"Count": 104, "#Objs": 1, "Objects": [{"status": 7, "D": -136, "S": 2332160, "Signal": 0.27, "Ambient": 0.10}]}
+{"Count": 105, "#Objs": 2, "Objects": [{"status": 7, "D": 173, "S": 1623552, "Signal": 0.06, "Ambient": 0.12},
+                     {"status": 7, "D": 1486, "S": 2172416, "Signal": 0.03, "Ambient": 0.12}]}
+{"Count": 106, "#Objs": 1, "Objects": [{"status": 7, "D": -132, "S": 2504704, "Signal": 0.25, "Ambient": 0.10}]}
+{"Count": 107, "#Objs": 1, "Objects": [{"status": 7, "D": 156, "S": 1899520, "Signal": 0.05, "Ambient": 0.12}]}
+{"Count": 108, "#Objs": 1, "Objects": [{"status": 7, "D": -74, "S": 2762752, "Signal": 0.23, "Ambient": 0.10}]}
+{"Count": 109, "#Objs": 1, "Objects": [{"status": 7, "D": 151, "S": 1990656, "Signal": 0.04, "Ambient": 0.12}]}
+{"Count": 110, "#Objs": 1, "Objects": [{"status": 7, "D": -119, "S": 2788864, "Signal": 0.20, "Ambient": 0.10}]}
+{"Count": 111, "#Objs": 0, "Objects": []}
+{"Count": 112, "#Objs": 1, "Objects": [{"status": 4, "D": -180, "S": 3020800, "Signal": 0.20, "Ambient": 0.09}]}
+{"Count": 113, "#Objs": 0, "Objects": []}
+{"Count": 114, "#Objs": 1, "Objects": [{"status": 4, "D": -193, "S": 3075584, "Signal": 0.18, "Ambient": 0.10}]}
+{"Count": 115, "#Objs": 0, "Objects": []}
+{"Count": 116, "#Objs": 1, "Objects": [{"status": 4, "D": -261, "S": 2180096, "Signal": 0.16, "Ambient": 0.10}]}
+{"Count": 117, "#Objs": 1, "Objects": [{"status": 0, "D": 1990, "S": 1545216, "Signal": 0.04, "Ambient": 0.12}]}
+{"Count": 118, "#Objs": 1, "Objects": [{"status": 0, "D": 2038, "S": 2081280, "Signal": 0.15, "Ambient": 0.11}]}
+{"Count": 119, "#Objs": 0, "Objects": []}
+{"Count": 120, "#Objs": 1, "Objects": [{"status": 4, "D": -257, "S": 2076672, "Signal": 0.15, "Ambient": 0.11}]}
+{"Count": 121, "#Objs": 0, "Objects": []}
+{"Count": 122, "#Objs": 2, "Objects": [{"status": 12, "D": 126, "S": 1595904, "Signal": 0.07, "Ambient": 0.11},
+                     {"status": 4, "D": 1793, "S": 2102272, "Signal": 0.09, "Ambient": 0.11}]}
+{"Count": 123, "#Objs": 0, "Objects": []}
+{"Count": 124, "#Objs": 2, "Objects": [{"status": 12, "D": 130, "S": 1484800, "Signal": 0.08, "Ambient": 0.11},
+                     {"status": 4, "D": 1809, "S": 2179584, "Signal": 0.09, "Ambient": 0.11}]}
+{"Count": 125, "#Objs": 0, "Objects": []}
+{"Count": 126, "#Objs": 1, "Objects": [{"status": 4, "D": -198, "S": 2962944, "Signal": 0.16, "Ambient": 0.10}]}
+{"Count": 127, "#Objs": 1, "Objects": [{"status": 0, "D": 1837, "S": 1950720, "Signal": 0.04, "Ambient": 0.12}]}
+{"Count": 128, "#Objs": 1, "Objects": [{"status": 0, "D": 2113, "S": 2498048, "Signal": 0.16, "Ambient": 0.10}]}
+{"Count": 129, "#Objs": 2, "Objects": [{"status": 0, "D": 1836, "S": 1767424, "Signal": 0.05, "Ambient": 0.11},
+                     {"status": 4, "D": 2162, "S": 1522688, "Signal": 0.05, "Ambient": 0.11}]}
+{"Count": 130, "#Objs": 1, "Objects": [{"status": 0, "D": 2107, "S": 2355712, "Signal": 0.16, "Ambient": 0.10}]}
+{"Count": 131, "#Objs": 2, "Objects": [{"status": 0, "D": 1820, "S": 1917440, "Signal": 0.04, "Ambient": 0.12},
+                     {"status": 4, "D": 2176, "S": 1581056, "Signal": 0.04, "Ambient": 0.12}]}
+{"Count": 132, "#Objs": 1, "Objects": [{"status": 0, "D": 2092, "S": 2480640, "Signal": 0.16, "Ambient": 0.10}]}
+{"Count": 133, "#Objs": 1, "Objects": [{"status": 0, "D": 1805, "S": 1899520, "Signal": 0.04, "Ambient": 0.11}]}
+{"Count": 134, "#Objs": 1, "Objects": [{"status": 0, "D": 2101, "S": 2192896, "Signal": 0.16, "Ambient": 0.10}]}
+{"Count": 135, "#Objs": 1, "Objects": [{"status": 0, "D": 1809, "S": 2136576, "Signal": 0.04, "Ambient": 0.12}]}
+{"Count": 136, "#Objs": 1, "Objects": [{"status": 0, "D": 2091, "S": 2174464, "Signal": 0.15, "Ambient": 0.10}]}
+{"Count": 137, "#Objs": 0, "Objects": []}
+{"Count": 138, "#Objs": 1, "Objects": [{"status": 4, "D": -288, "S": 2360320, "Signal": 0.13, "Ambient": 0.10}]}
+{"Count": 139, "#Objs": 0, "Objects": []}
+{"Count": 140, "#Objs": 2, "Objects": [{"status": 4, "D": -385, "S": 2142720, "Signal": 0.14, "Ambient": 0.10},
+                     {"status": 12, "D": 389, "S": 2506240, "Signal": 0.03, "Ambient": 0.10}]}
+{"Count": 141, "#Objs": 1, "Objects": [{"status": 0, "D": 1647, "S": 2297344, "Signal": 0.03, "Ambient": 0.12}]}
+{"Count": 142, "#Objs": 1, "Objects": [{"status": 0, "D": 4725, "S": 126976, "Signal": 13.47, "Ambient": 0.10}]}
+{"Count": 143, "#Objs": 1, "Objects": [{"status": 0, "D": 173, "S": 1111040, "Signal": 0.31, "Ambient": 0.13}]}
+{"Count": 144, "#Objs": 1, "Objects": [{"status": 0, "D": 140, "S": 446464, "Signal": 1.20, "Ambient": 0.10}]}
+{"Count": 145, "#Objs": 0, "Objects": []}
+{"Count": 146, "#Objs": 0, "Objects": []}
+{"Count": 147, "#Objs": 0, "Objects": []}
+{"Count": 148, "#Objs": 0, "Objects": []}
+{"Count": 149, "#Objs": 0, "Objects": []}
+{"Count": 150, "#Objs": 0, "Objects": []}
+{"Count": 151, "#Objs": 0, "Objects": []}
+{"Count": 152, "#Objs": 1, "Objects": [{"status": 4, "D": -312, "S": 1739264, "Signal": 0.07, "Ambient": 0.10}]}
+{"Count": 153, "#Objs": 0, "Objects": []}
+{"Count": 154, "#Objs": 1, "Objects": [{"status": 4, "D": 1887, "S": 3136512, "Signal": 0.12, "Ambient": 0.10}]}
+{"Count": 155, "#Objs": 0, "Objects": []}
+{"Count": 156, "#Objs": 1, "Objects": [{"status": 4, "D": -260, "S": 2464256, "Signal": 0.20, "Ambient": 0.09}]}
+{"Count": 157, "#Objs": 0, "Objects": []}
+{"Count": 158, "#Objs": 1, "Objects": [{"status": 4, "D": -262, "S": 2388480, "Signal": 0.18, "Ambient": 0.10}]}
+{"Count": 159, "#Objs": 1, "Objects": [{"status": 0, "D": 1983, "S": 1622528, "Signal": 0.04, "Ambient": 0.12}]}
+{"Count": 160, "#Objs": 1, "Objects": [{"status": 0, "D": 2037, "S": 2170880, "Signal": 0.18, "Ambient": 0.10}]}
+{"Count": 161, "#Objs": 1, "Objects": [{"status": 0, "D": 1995, "S": 1501184, "Signal": 0.05, "Ambient": 0.12}]}
+{"Count": 162, "#Objs": 1, "Objects": [{"status": 0, "D": 2042, "S": 2162176, "Signal": 0.19, "Ambient": 0.10}]}
+{"Count": 163, "#Objs": 1, "Objects": [{"status": 0, "D": 1999, "S": 1510400, "Signal": 0.04, "Ambient": 0.12}]}
+{"Count": 164, "#Objs": 1, "Objects": [{"status": 0, "D": 2061, "S": 2061824, "Signal": 0.19, "Ambient": 0.09}]}
+{"Count": 165, "#Objs": 1, "Objects": [{"status": 0, "D": 2014, "S": 1550848, "Signal": 0.04, "Ambient": 0.12}]}
+{"Count": 166, "#Objs": 1, "Objects": [{"status": 0, "D": 2096, "S": 2812416, "Signal": 0.17, "Ambient": 0.09}]}
