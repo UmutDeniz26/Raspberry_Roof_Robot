@@ -31,7 +31,7 @@ def dict_to_str( data: dict ) -> str:
     except:
         raise ValueError("Error converting dictionary to string.")
 
-def convert_to_dict( Command, Type, X=None, Y=None, Speed=None ):
+def convert_to_dict( Command, Type, X=None, Y=None):
     """
     """
     if Type == "gps":
@@ -44,8 +44,7 @@ def convert_to_dict( Command, Type, X=None, Y=None, Speed=None ):
                 "Type": Type,
                 "Command": Command,
                 "X": X,
-                "Y": Y,
-                "Speed": Speed
+                "Y": Y
             }
 
        
