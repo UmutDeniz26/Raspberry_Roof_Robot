@@ -196,6 +196,13 @@ class Raspberry_Server:
                         
                         # Send the data back to the client ( Optional ) ( Echo server )
                         conn.sendall(data_received) if self.ECHO_SERVER else None
+                    try:
+                        data_received = self.get_message_from_client(conn)
+                        if data_received is None:
+                            continue
+                        
+                        # Send the data back to the client ( Optional ) ( Echo server )
+                        conn.sendall(data_received) if self.ECHO_SERVER else None
 
                         # Decode the data and convert to json dict.
                         received_data_string = data_received.decode('utf-8')
@@ -236,6 +243,7 @@ def main():
 
     server = Raspberry_Server( 
         wait_response=True, echo_server=False, time_out_limit=5 , HOST=HOST, PORT=PORT,
+        serial_port_baud_rate=19200,serial_port_device='/dev/ttyUSB0', enable_time_measurement=False, send_ard_bit_or_dict=False
         serial_port_baud_rate=19200,serial_port_device='/dev/ttyUSB0', enable_time_measurement=False, send_ard_bit_or_dict=False
         )
     server.main_loop()
