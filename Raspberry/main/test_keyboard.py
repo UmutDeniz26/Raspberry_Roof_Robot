@@ -9,11 +9,8 @@ HOST = "192.168.1.13"
 PORT = 5000
 
 
-def dict_creater(type_, command, value_list=[]):
-    ret = "{\"Type\": \"" + type_ + "\", \"Command\": \"" + command + "\","
-    for index, value in enumerate(value_list):
-        ret += f" \"Value{index+1}\": {value},"
-    ret = ret[:-1] + "}"
+def dict_creater(type_, command, X=0.0, Y=0.0, speed=0.0):
+    ret = "{\"Type\": \"" + type_ + "\", \"Command\": \"" + command + "\"," + "\"X\": " + str(X) + ", \"Y\": " + str(Y) + ", \"Speed\": " + str(speed) + "}"
     return ret
 
 def main():
@@ -48,7 +45,7 @@ def main():
                 message = dict_creater("robot_move", "stop")
 
             if message == None:
-                message = dict_creater("robot_move", "move", [x, y])
+                message = dict_creater("robot_move", "move", x, y, 255.0)
                 time.sleep(0.1)
 
             if message == last_message:

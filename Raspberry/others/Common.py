@@ -16,17 +16,24 @@ def str_to_json_dict( data_str: str ) -> dict:
         raise ValueError("Error converting string to json dictionary.")
 
 
-def json_dict_to_string(json_dict: dict) -> str:
+def convert_to_dict( Command, Type, X=None, Y=None, Speed=None ):
     """
-        Convert a dictionary to a json string. Deletes \n characters from the string.
-        Args:
-            json_dict (dict): The dictionary to convert to a json string.
+    """
+    if Type == "gps":
+        return {
+                "Type": Type,
+                "Command": Command
+            }
+    elif Type == "robot_move":
+        return {
+                "Type": Type,
+                "Command": Command,
+                "X": X,
+                "Y": Y,
+                "Speed": Speed
+            }
 
-        Returns:
-            str: The json string.
-    """
-    json_string = str(json_dict).replace("\n", "").replace("\"", "'")
-    return json_string
+       
 
 def convert_message_to_bytes(message) -> bytes:
     """

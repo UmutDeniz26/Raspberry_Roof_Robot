@@ -15,7 +15,7 @@ class Raspberry_Server:
     """
         A class to run the server on the Raspberry Pi.
     """
-    def __init__(self,HOST:str, PORT:int, echo_server:bool, wait_response:bool, enable_time_measurement:bool, time_out_limit:int
+    def __init__(self,HOST:str, PORT:int, echo_server:bool, wait_response:bool, enable_time_measurement:bool, time_out_limit:int,send_ard_bit_or_dict:bool
                 , serial_port_baud_rate: int, serial_port_device:str         
         ) -> None:
         
@@ -29,6 +29,7 @@ class Raspberry_Server:
         self.TIME_MEASUREMENT = enable_time_measurement # Measures processing times
         self.SERIAL_PORT_BAUD_RATE = serial_port_baud_rate # Baud rate
         self.SERIAL_PORT_DEVICE = serial_port_device       # Connection device
+        self.SEND_ARD_BIT_OR_DICT = send_ard_bit_or_dict # Send the message as a bit or a dictionary
         
         self.init_server(HOST, PORT)
         self.init_serial_port( serial_port_baud_rate, serial_port_device )
@@ -77,6 +78,28 @@ class Raspberry_Server:
         except Exception as e:
             print("Serial port is not available. Please check the connection: ", e)
             
+    def prepare_arduino_message(self, message_raw) -> str:
+        """
+            Prepare the message to send to the Arduino.
+
+            Args:
+                message_raw (Dynamic): The message to send to the Arduino.
+
+            Returns:
+                str: The message to send to the Arduino.
+        """
+        # Encode the message to bytes. If the message is not a string or a dictionary, return an error message.
+        if self.SEND_ARD_BIT_OR_DICT:
+            message, success = Common.convert_message_to_bytes(message_raw)
+            if not success:
+                return message
+        else:
+            if type(message_raw) == str:
+                message_raw = Common.str_to_json_dict(message_raw)
+            message = Common.convert_to_dict( message_raw["Command"], message_raw["Type"], message_raw["X"], message_raw["Y"], message_raw["Speed"] )
+            message = message.encode('utf-8')
+
+        return message
 
     def transmit_receive_arduino(self, message_raw) -> str:
         """
@@ -95,12 +118,10 @@ class Raspberry_Server:
             return "{'error':'Serial port is not available.'}"
 
         # Encode the message to bytes. If the message is not a string or a dictionary, return an error message.
-        message, success = Common.convert_message_to_bytes(message_raw)
-        if not success:
-            return message
-        
-        print("Raw Message Type: ", type(message_raw), " Size: ", sys.getsizeof(message_raw) , " data : ", message_raw)        
-        print("Encoded Message Type: ", type(message), " Size: ", sys.getsizeof(message) , " data : ", message)
+        message = self.prepare_arduino_message(message_raw)
+
+        print("Raw Message Type: ", type(message_raw), " Size: ", sys.getsizeof(message_raw) , " data : ", message_raw)
+        print("Processed Message Type: ", type(message), " Size: ", sys.getsizeof(message) , " data : ", message)
         
         self.ser.reset_input_buffer()
         hold = time.time()
@@ -127,6 +148,24 @@ class Raspberry_Server:
             elif math.fabs(time.time() - hold) > 0.7:
                 return "{'information': 'Waiting for response is disabled.'}"
 
+    def get_message_from_client(self, conn) -> str:
+        """
+            Get a message from the client.
+
+            Args:
+                conn (socket): The connection object.
+
+            Returns:
+                str: The message from the client.
+        """
+        try:
+            data_received = conn.recv(1024) # 1024 is the buffer size in bytes
+            if not data_received:
+                return None
+            return data_received.decode('utf-8')
+        except ConnectionResetError:
+            print("Connection was reset by the client")
+            return None
 
     def main_loop(self) -> None:
         """
@@ -142,28 +181,21 @@ class Raspberry_Server:
                     
                     # Receive data from the client
                     while True:
-                        try:
-                            data_received = conn.recv(1024) # 1024 is the buffer size in bytes
-                            if not data_received:
-                                break
-                            self.timer.start_new_timer("end_to_end_time") if self.TIME_MEASUREMENT else None
-                        except ConnectionResetError:
-                            print("Connection was reset by the client")
-                            break
+                        data_received = self.get_message_from_client(conn)
                         
                         # Send the data back to the client ( Optional ) ( Echo server )
                         conn.sendall(data_received) if self.ECHO_SERVER else None
 
                         # Decode the data and convert to json dict.
-                        data_received_string = data_received.decode('utf-8')
+                        received_data_string = data_received.decode('utf-8')
                         
-                        if data_received_string[-1] == "}":
-                            transmit_data = Common.str_to_json_dict(data_received_string)
+                        if received_data_string[-1] == "}":
+                            received_data_dict = Common.str_to_json_dict(received_data_string)
+                            response_from_arduino = self.transmit_receive_arduino( received_data_dict )
                         else:
-                            transmit_data = data_received_string
+                            response_from_arduino = self.transmit_receive_arduino( received_data_string )
 
-                        # Sending the message to the Arduino
-                        response_from_arduino = self.transmit_receive_arduino( transmit_data )
+                        # Sending the message to the Arduino                        
                         conn.sendall(response_from_arduino.encode('utf-8'))
                         
                         # Print the response
@@ -190,7 +222,7 @@ def main():
 
     server = Raspberry_Server( 
         wait_response=True, echo_server=False, time_out_limit=5 , HOST=HOST, PORT=PORT,
-        serial_port_baud_rate=14400,serial_port_device='/dev/ttyUSB0', enable_time_measurement=True,
+        serial_port_baud_rate=14400,serial_port_device='/dev/ttyUSB0', enable_time_measurement=True, send_ard_bit_or_dict=False
         )
     server.main_loop()
     del server
