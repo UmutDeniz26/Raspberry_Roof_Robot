@@ -76,6 +76,11 @@ class Raspberry_Server:
     def init_serial_port(self, baud_rate, dev ):
         try:
             self.ser = serial.Serial( baudrate=baud_rate, port=dev , timeout=1)
+            
+            # Flush the input and output buffers
+            self.ser.flushInput()
+            self.ser.flushOutput()
+
         except Exception as e:
             print("Serial port is not available. Please check the connection: ", e)
             

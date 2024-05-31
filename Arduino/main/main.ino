@@ -165,8 +165,8 @@ void control_right_motor_forward(int speed){
   speed = speed > 255 ? 255 : speed; speed = speed < 0 ? 0 : speed;
 
   //MOTOR_B CLOCKWISE MAX SPEED
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
   analogWrite(enb, speed);
 }
 
@@ -187,8 +187,8 @@ void control_right_motor_backward(int speed){
   speed = speed > 255 ? 255 : speed; speed = speed < 0 ? 0 : speed;
 
   //MOTOR_B COUNTERCLOCKWISE MAX SPEED
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
   analogWrite(enb, speed);
 }
 
