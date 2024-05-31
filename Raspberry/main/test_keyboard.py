@@ -10,7 +10,7 @@ PORT = 5000
 
 
 def dict_creater(type_, command, X=0.0, Y=0.0):
-    ret = "{\"Type\": \"" + type_ + "\", \"Command\": \"" + command + "\"," + "\"X\": " + str(X) + ", \"Y\": " + str(Y) + "}"
+    ret = "{\"Type\": \"" + type_ + "\", \"Command\": \"" + command + "\"," + "\"X\": " + str(X) + ", \"Y\": " + str(Y) + "}\n"
     return ret
 
 def main():
@@ -32,10 +32,10 @@ def main():
             key = ''
             
             if keyboard.is_pressed('s'):
-                y = y-0.1 if y-0.1>-1 else -1.0
+                y = -1#y-0.1 if y-0.1>-1 else -1.0
                 key = 's'
             elif keyboard.is_pressed('w'):
-                y = y+0.1 if y+0.1<1 else 1.0
+                y = 1#y+0.1 if y+0.1<1 else 1.0
                 key = 'w'
             elif keyboard.is_pressed('d'):
                 x = x+0.1 if x+0.1<1 else 1.0
@@ -52,7 +52,7 @@ def main():
                 s.close()
                 return
             else:
-                message = dict_creater("robot_move", "stop")
+                message = dict_creater("robot_move", "stop", x, y)
 
             if message == None:
                 message = dict_creater("robot_move", "move", x, y)
