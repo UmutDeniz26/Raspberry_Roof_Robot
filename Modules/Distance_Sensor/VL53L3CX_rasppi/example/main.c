@@ -191,6 +191,7 @@ void ClearTxtFile(const char *output_file_path)
 /* USER CODE BEGIN 4 *//* ranging and display loop */
 void RangingLoop(const char *output_file_path)
 {
+  printf("Output file path: %s\n", output_file_path);
   FILE *output_file;
   output_file = fopen(output_file_path, "a"); // Open file for writing
   
