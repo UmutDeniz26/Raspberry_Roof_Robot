@@ -39,9 +39,13 @@ def main():
                 key = 'w'
             elif keyboard.is_pressed('d'):
                 x = x+0.1 if x+0.1<1 else 1.0
+                x = 0 if x<0 else x
+                y = 0
                 key = 'd'
             elif keyboard.is_pressed('a'):
                 x = x-0.1 if x-0.1>-1 else -1.0
+                x = 0 if x>0 else x
+                y = 0
                 key = 'a'
             elif keyboard.is_pressed('g'):
                 key = 'g'
