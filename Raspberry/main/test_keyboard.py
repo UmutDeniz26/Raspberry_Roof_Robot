@@ -4,7 +4,7 @@ import time
 import re
 import keyboard
 import select
-
+w
 HOST = "192.168.1.13"
 PORT = 5000
 
