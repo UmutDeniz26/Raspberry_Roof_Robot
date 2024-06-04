@@ -19,7 +19,7 @@ const unsigned long motor_time_out = 5000; // Interval for motor movements
 unsigned long previousTimeMPU = 0;
 const unsigned long mpuInterval = 5000; // Interval for MPU6050 readings
 
-int RXPin = 3;
+int RXPin = 0;
 int TXPin = 2;
 SoftwareSerial gpsSerial(RXPin, TXPin);
 
@@ -84,7 +84,7 @@ void loop() {
   currentTime = millis();
   
   // Check for incoming data
-  if (Serial.available() > 0) {
+  if (Serial.available() > 0) { 
 
     // Read the incoming data *Note: Our stop character is '\n'
     data = Serial.readStringUntil('\n');
@@ -206,7 +206,7 @@ MotorSpeeds detailed_direction_motor_control(float x, float y) {
     // Speed is the speed of the motors ( between 0 and 255 )
     // The function will control the motors to move the robot in the direction of the joystick
 
-    int MIN_SPEED = 100;
+    int MIN_SPEED = 20;
     int MAX_SPEED = 255;
 
     int difference_min_max = MAX_SPEED - MIN_SPEED;

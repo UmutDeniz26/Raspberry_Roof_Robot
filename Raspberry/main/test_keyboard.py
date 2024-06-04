@@ -4,9 +4,9 @@ import time
 import re
 import keyboard
 import select
-w
-HOST = "192.168.1.13"
-PORT = 5000
+
+HOST = "192.168.19.243"
+PORT = 5001
 
 
 def dict_creater(type_, command, X=0.0, Y=0.0):
