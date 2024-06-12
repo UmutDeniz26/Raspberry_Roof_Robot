@@ -244,21 +244,21 @@ class Raspberry_Server:
                         conn.sendall(data_received) if self.ECHO_SERVER else None
 
                         # Decode the data and convert to json dict.
-                        received_data_string = data_received.decode('utf-8')
-                        print(f"Data received from client: {received_data_string}")
+                        received_data = data_received.decode('utf-8')
+                        print(f"Data received from client: {received_data }")
                         
-                        if received_data_string[-1] == "}":
-                            received_data_dict = Common.str_to_json_dict(received_data_string)
-                            response_from_arduino = self.transmit_receive_arduino( received_data_dict )
-                        else:
-                            response_from_arduino = self.transmit_receive_arduino( received_data_string )
-
+                        if received_data [-1] == "}":
+                            received_data  = Common.str_to_json_dict(received_data )
+                        
+                        response_from_arduino = self.transmit_receive_arduino( received_data  )
+                        
                         # Sending the message to the Client                        
                         conn.sendall(response_from_arduino.encode('utf-8'))
                         
                         # Print the response
                         print(f"Data received from Arduino: {response_from_arduino} \n")
 
+                        # Measure the processing time
                         self.timer.stop_timer("end_to_end_time") if self.TIME_MEASUREMENT else None
                     
                     # With traceback         
