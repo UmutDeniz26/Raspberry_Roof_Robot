@@ -1,24 +1,29 @@
-import subprocess
+import json
+import time
 
-def run_sensor_code():
-    # Compile and run the C code
-    result = subprocess.run(["gcc", "-o", "sensor", "/home/umut/Desktop/Raspberry_Roof_Robot/Tests/Distance_Sensor/VL53L3CX_rasppi/example/main_custom.c"], capture_output=True)
-    if result.returncode == 0:
-        # Run the compiled executable
-        result = subprocess.run(["./sensor"], capture_output=True, text=True)
-        if result.returncode == 0:
-            # Parse the output to extract the average distance
-            output_lines = result.stdout.split('\n')
-            for line in output_lines:
-                if line.startswith("Average Distance:"):
-                    average_distance = int(line.split(":")[1].strip().split(" ")[0])
-                    return average_distance
-        else:
-            print("Error running sensor code:", result.stderr)
-    else:
-        print("Error compiling sensor code:", result.stderr)
+def get_distance(output_path):
+    with open(output_path, 'r') as file:
+        data = file.readlines()
+        try:
+            return str_to_json(data[-1])
+        except:
+            time.sleep(0.5)
+            try:
+                return str_to_json(data[-1])
+            except:
+                return {'error': 'No data found'}
+def get_max_distance(output_path):
+    objects = get_distance(output_path)['Objects']
+    if len(objects) == 0:
+        return 0
+    return max(objects, key=lambda x: x['D'])['D']
 
-# Run the sensor code and get the average distance
-average_distance = run_sensor_code()
-if average_distance is not None:
-    print("Average Distance measured by sensor:", average_distance, "mm")
+
+def str_to_json(data):
+    return json.loads(data)
+
+output_path = 'Modules/Distance_Sensor/VL53L3CX_rasppi/vl53l3cx_ranging_output.txt'
+
+if __name__ == '__main__':
+    print(get_distance(output_path))
+    print(get_max_distance(output_path))

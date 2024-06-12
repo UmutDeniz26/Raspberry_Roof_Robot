@@ -13,6 +13,7 @@ from Utils.timer import Timer
 from Raspberry.others import Stream_operations
 from others import Common
 from Modules.Camera.camera_stream import camera_stream_start
+from Modules.Distance_Sensor.get_distance import get_max_distance
 
 class Raspberry_Server:
     """
@@ -95,10 +96,13 @@ class Raspberry_Server:
         Args:
             port (int): The port to start the camera stream on.
         """
-        thread = threading.Thread(target=camera_stream_start, args=(port,))
-        thread.start()
-        time.sleep(1)
-        
+        try:
+            thread = threading.Thread(target=camera_stream_start, args=(port,))
+            thread.start()
+            time.sleep(1)
+        except Exception as e:
+            print(f"An error occurred while starting the camera stream: {e}")
+
     def prepare_arduino_message(self, message_raw) -> str:
         """
             Prepare the message to send to the Arduino.
@@ -187,6 +191,11 @@ class Raspberry_Server:
             elif math.fabs(time.time() - hold) > 0.7:
                 return "{'information': 'Waiting for response is disabled.'}"
 
+    def get_distance_from_sensor(self) -> int:
+        max_distance = get_max_distance('Modules/Distance_Sensor/VL53L3CX_rasppi/vl53l3cx_ranging_output.txt')
+        return max_distance
+
+
     def get_message_from_client(self, conn) -> str:
         """
             Get a message from the client.
@@ -210,15 +219,23 @@ class Raspberry_Server:
         """
             The main loop of the server.
         """
-        while True:
+
+
+        while True:    
+            print("Waiting for a connection...")
             conn, addr = self.socket.accept()
             with conn:
-
                 print(f"Connected from {addr}")
                 
                 # Receive data from the client
                 while True:
                     try:
+                        # Start the distance measurement
+                        if  "time_hold" not in locals() or time.time() - time_hold > 1:
+                            max_distance = self.get_distance_from_sensor()
+                            print("Max distance is ", max_distance)
+                            time_hold = time.time()
+
                         data_received = self.get_message_from_client(conn)
                         if data_received is None:
                             continue
@@ -241,6 +258,7 @@ class Raspberry_Server:
                         
                         # Print the response
                         print(f"Data received from Arduino: {response_from_arduino} \n")
+
                         self.timer.stop_timer("end_to_end_time") if self.TIME_MEASUREMENT else None
                     
                     # With traceback         

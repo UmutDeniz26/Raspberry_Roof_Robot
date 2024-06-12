@@ -42,6 +42,7 @@
 /* USER CODE BEGIN Includes */
 #include "vl53lx_api.h"
 #include "vl53lx_platform.h"
+
 /* USER CODE END Includes */
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
@@ -211,6 +212,8 @@ void RangingLoop(const char *output_file_path)
   status = VL53LX_WaitDeviceBooted(Dev);
   status = VL53LX_DataInit(Dev);
   status = VL53LX_StartMeasurement(Dev);
+
+  int clear_counter = 0;
   
   if(status){
     fprintf(output_file, "{\"Error\": \"VL53LX_StartMeasurement failed\", \"status\": \" %d \"}\n", status);
@@ -229,13 +232,15 @@ void RangingLoop(const char *output_file_path)
     }
   
     status = VL53LX_GetMeasurementDataReady(Dev, &NewDataReady);                        
-    usleep(1000000); // 1000 millisecond polling period, could be 1 millisecond.
+    usleep(500000); // 500 millisecond polling period, could be 1 millisecond.
     if((!status)&&(NewDataReady!=0)){
       status = VL53LX_GetMultiRangingData(Dev, pMultiRangingData);
       no_of_object_found=pMultiRangingData->NumberOfObjectsFound;
       fprintf(output_file, "{\"Count\": %d, \"#Objs\": %d, \"Objects\": [", pMultiRangingData->StreamCount, no_of_object_found);
       for(j = 0; j < no_of_object_found; j++){
           if(j != 0) fprintf(output_file, ",\n                     ");
+
+          clear_counter++;
 
           fprintf(output_file, "{\"status\": %d, \"D\": %d, \"S\": %d, \"Signal\": %.2f, \"Ambient\": %.2f}",
                 pMultiRangingData->RangeData[j].RangeStatus,
@@ -245,8 +250,21 @@ void RangingLoop(const char *output_file_path)
                 pMultiRangingData->RangeData[j].AmbientRateRtnMegaCps / 65536.0);
       }
 
+
       fprintf(output_file, "]}\n");
       fflush(output_file); // Flush the file buffer to ensure data is written to file immediately
+
+
+      if (clear_counter > 20) {
+        clear_counter = 0;
+        fclose(output_file);
+        output_file = fopen(output_file_path, "w"); // Open file for writing
+        if (output_file == NULL) {
+          printf("Error opening file!\n");
+          return;
+        }
+        fprintf(output_file, "{\"initial_entry\": \"Clearing the old file\"}\n");
+      }
 
       if (status==0){
         status = VL53LX_ClearInterruptAndStartMeasurement(Dev);

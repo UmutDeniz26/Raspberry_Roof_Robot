@@ -11,3 +11,7 @@ SDA on sensor to pin 3 SDA on Raspberry Pi.
 SCL on sensor to pin 5 SCL on Raspberry Pi.
 XSHUT on sensor is left unconnected (it defaults pull up to VDD i.e. sensor is enabled).
 GPIO1 on sensor is left unconnected (this goes high when a new measurement is ready).
+
+
+Creating .so file
+ cc -fPIC -shared -o my_functions.so -Icore/inc/ -Iplatform/inc/ example/main.c
