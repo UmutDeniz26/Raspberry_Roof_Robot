@@ -5,12 +5,14 @@ import time
 import sys
 import traceback
 import re
+import threading
 
 sys.path.insert(0,"Raspberry")
 sys.path.insert(0,".")
 from Utils.timer import Timer
 from Raspberry.others import Stream_operations
 from others import Common
+from Modules.Camera.camera_stream import camera_stream_start
 
 class Raspberry_Server:
     """
@@ -32,6 +34,7 @@ class Raspberry_Server:
         self.SERIAL_PORT_DEVICE = serial_port_device        # Connection device
         self.SEND_ARD_BIT_OR_DICT = send_ard_bit_or_dict    # Send the message as a bit or a dictionary
         
+        self.start_camera_stream_thread(8080)
         self.init_server(HOST, PORT)
         self.init_serial_port( serial_port_baud_rate, serial_port_device )
         self.timer = Timer() if self.TIME_MEASUREMENT else None
@@ -83,7 +86,19 @@ class Raspberry_Server:
 
         except Exception as e:
             print("Serial port is not available. Please check the connection: ", e)
-            
+
+
+    def start_camera_stream_thread(self, port: int) -> None:
+        """
+        Starts the camera stream on a new thread.
+
+        Args:
+            port (int): The port to start the camera stream on.
+        """
+        thread = threading.Thread(target=camera_stream_start, args=(port,))
+        thread.start()
+        time.sleep(1)
+        
     def prepare_arduino_message(self, message_raw) -> str:
         """
             Prepare the message to send to the Arduino.
@@ -108,6 +123,7 @@ class Raspberry_Server:
 
 
         return message
+    
 
     def transmit_receive_arduino(self, message_raw) -> str:
         """
