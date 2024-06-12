@@ -19,7 +19,7 @@ const unsigned long motor_time_out = 5000; // Interval for motor movements
 unsigned long previousTimeMPU = 0;
 const unsigned long mpuInterval = 5000; // Interval for MPU6050 readings
 
-int RXPin = 3;
+int RXPin = 0;
 int TXPin = 2;
 SoftwareSerial gpsSerial(RXPin, TXPin);
 
@@ -38,7 +38,14 @@ void left(int speed);
 void backward(int speed);
 void stop();
 
-void detailed_direction_motor_control(float x, float y);
+
+struct MotorSpeeds {
+    int left_speed;
+    int right_speed;
+};
+
+MotorSpeeds detailed_direction_motor_control(float x, float y);
+
 
 String readGPSData();
 struct MPUData getMPUData();
@@ -77,7 +84,7 @@ void loop() {
   currentTime = millis();
   
   // Check for incoming data
-  if (Serial.available() > 0) {
+  if (Serial.available() > 0) { 
 
     // Read the incoming data *Note: Our stop character is '\n'
     data = Serial.readStringUntil('\n');
@@ -90,24 +97,26 @@ void loop() {
     if (!error) {
       // Access JSON data here
       String type = doc["Type"];
-      String command = doc["Command"];
+      //String command = doc["Command"];
       
       // Check the type of command
       if (type == "robot_move"){
+        /*
         if (command == "stop"){
           stop();
           return_output = "{\"Command\": \"stop\"}";
         }
-        else{
-          // Get the speed, x and y values
-          float x = doc["X"];
-          float y = doc["Y"];
+        */
+        // Get the speed, x and y values
+        
+        float x = doc["X"];
+        float y = doc["Y"];
 
-          detailed_direction_motor_control(x, y);
+        MotorSpeeds speeds = detailed_direction_motor_control(x, y);
 
-          return_output = "{\"X\": "+String(x)+", \"Y\": "+String(y)+"}";
-          hold_last_movement = currentTime;
-        }
+        return_output = "{\"X\": "+String(x)+", \"Y\": "+String(y)+", \"Left Speed\": "+String(speeds.left_speed)+", \"Right Speed\": "+String(speeds.right_speed)+"}";
+        hold_last_movement = currentTime;
+      
       }
       else if(type=="gps"){
         GPS_data = readGPSData();
@@ -191,120 +200,113 @@ void control_right_motor_backward(int speed){
   digitalWrite(in4, HIGH);
   analogWrite(enb, speed);
 }
-
 // Move the robot in a detailed direction
-void detailed_direction_motor_control(float x, float y ){
-  // X and Y are the coordinates of the joystick ( between -1 and 1 )
-  // Speed is the speed of the motors ( between 0 and 255 )
-  // The function will control the motors to move the robot in the direction of the joystick
+MotorSpeeds detailed_direction_motor_control(float x, float y) {
+    // X and Y are the coordinates of the joystick ( between -1 and 1 )
+    // Speed is the speed of the motors ( between 0 and 255 )
+    // The function will control the motors to move the robot in the direction of the joystick
 
-  int MIN_SPEED = 180;
-  int MAX_SPEED = 255;
+    int MIN_SPEED = 20;
+    int MAX_SPEED = 255;
 
-  int difference_min_max = MAX_SPEED - MIN_SPEED;
+    int difference_min_max = MAX_SPEED - MIN_SPEED;
 
-  int MAX_SPEED_DIFF = difference_min_max * 1; // This coefficient can be adjusted to change the speed difference between the motors
+    int MAX_SPEED_DIFF = difference_min_max * 1; // This coefficient can be adjusted to change the speed difference between the motors
 
-  int left_speed, right_speed;
+    MotorSpeeds speeds = {0, 0};
 
-  // If the joystick is in the middle, stop the robot
-  if (x == 0 && y == 0){
-    stop();
-  }
-  // If the joystick is in the top right corner -> Forward Right
-  else if (x > 0 && y > 0){
-    // Calculate the speed of the left motor
-    left_speed  = MIN_SPEED + (difference_min_max * y) + (MAX_SPEED_DIFF/2 * x);
+    // If the joystick is in the middle, stop the robot
+    if (x == 0 && y == 0) {
+        stop();
+    }
+    // If the joystick is in the top right corner -> Forward Right
+    else if (x > 0 && y > 0) {
+        // Calculate the speed of the left motor
+        speeds.left_speed = MIN_SPEED + (difference_min_max * y) + (MAX_SPEED_DIFF / 2 * x);
 
-    if (left_speed > 255){
-      left_speed = 255;
-      right_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF * x);
-    }
-    else{
-      // Calculate the speed of the right motor
-      right_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF/2 * x);
-    }
-    
-    // Control the left motor
-    control_left_motor_forward(left_speed);
-    // Control the right motor
-    control_right_motor_forward(right_speed);
-  }
-  // If the joystick is in the top left corner -> Forward Left
-  else if (x < 0 && y > 0){
-    // Calculate the speed of the left motor
-    right_speed = MIN_SPEED + (difference_min_max * y) + (MAX_SPEED_DIFF/2 * -x);
+        if (speeds.left_speed > 255) {
+            speeds.left_speed = 255;
+            speeds.right_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF * x);
+        } else {
+            // Calculate the speed of the right motor
+            speeds.right_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF / 2 * x);
+        }
 
-    if (right_speed > 255){
-      right_speed = 255;
-      left_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF * -x);
+        // Control the left motor
+        control_left_motor_forward(speeds.left_speed);
+        // Control the right motor
+        control_right_motor_forward(speeds.right_speed);
     }
-    else{
-      // Calculate the speed of the right motor
-      left_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF/2 * -x);
+    // If the joystick is in the top left corner -> Forward Left
+    else if (x < 0 && y > 0) {
+        // Calculate the speed of the left motor
+        speeds.right_speed = MIN_SPEED + (difference_min_max * y) + (MAX_SPEED_DIFF / 2 * -x);
+
+        if (speeds.right_speed > 255) {
+            speeds.right_speed = 255;
+            speeds.left_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF * -x);
+        } else {
+            // Calculate the speed of the right motor
+            speeds.left_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF / 2 * -x);
+        }
+
+        // Control the left motor
+        control_left_motor_forward(speeds.left_speed);
+        // Control the right motor
+        control_right_motor_forward(speeds.right_speed);
+    }
+    // If the joystick is in the bottom left corner -> Backward Left
+    else if (x < 0 && y < 0) {
+        // Calculate the speed of the right motor
+        speeds.right_speed = MIN_SPEED + (difference_min_max * -y) + (MAX_SPEED_DIFF / 2 * -x);
+
+        if (speeds.right_speed > 255) {
+            speeds.right_speed = 255;
+            speeds.left_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF * -x);
+        } else {
+            // Calculate the speed of the left motor
+            speeds.left_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF / 2 * -x);
+        }
+
+        // Control the left motor
+        control_left_motor_backward(speeds.left_speed);
+        // Control the right motor
+        control_right_motor_backward(speeds.right_speed);
+    }
+    // If the joystick is in the bottom right corner -> Backward Right
+    else if (x > 0 && y < 0) {
+        // Calculate the speed of the left motor
+        speeds.left_speed = MIN_SPEED + (difference_min_max * -y) + (MAX_SPEED_DIFF / 2 * x);
+
+        if (speeds.left_speed > 255) {
+            speeds.left_speed = 255;
+            speeds.right_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF * x);
+        } else {
+            // Calculate the speed of the right motor
+            speeds.right_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF / 2 * x);
+        }
+
+        // Control the left motor
+        control_left_motor_backward(speeds.left_speed);
+        // Control the right motor
+        control_right_motor_backward(speeds.right_speed);
+    } else if (x == 0) {
+        if (y > 0) {
+            backward(255);
+        } else {
+            forward(255);
+        }
+    } else if (y == 0) {
+        if (x > 0) {
+            right(255);
+        } else {
+            left(255);
+        }
     }
 
-    // Control the left motor
-    control_left_motor_forward(left_speed);
-    // Control the right motor
-    control_right_motor_forward(right_speed);
-  }
-  // If the joystick is in the bottom left corner -> Backward Left
-  else if (x < 0 && y < 0){
-    
-    // Calculate the speed of the right motor
-    right_speed = MIN_SPEED + (difference_min_max * -y) + (MAX_SPEED_DIFF/2 * -x);
-
-    if (right_speed > 255){
-      right_speed = 255;
-      left_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF * -x);
-    }
-    else{
-      // Calculate the speed of the left motor
-      left_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF/2 * -x);
-    }
-
-    // Control the left motor
-    control_left_motor_backward(left_speed);
-    // Control the right motor
-    control_right_motor_backward(right_speed);
-  }
-  // If the joystick is in the bottom right corner -> Backward Right
-  else if (x > 0 && y < 0){
-    // Calculate the speed of the left motor
-    left_speed = MIN_SPEED + (difference_min_max * -y) + (MAX_SPEED_DIFF/2 * x);
-
-    if (left_speed > 255){
-      left_speed = 255;
-      right_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF * x);
-    }
-    else{
-      // Calculate the speed of the right motor
-      right_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF/2 * x);
-    }
-    
-    // Control the left motor
-    control_left_motor_backward(left_speed);
-    // Control the right motor
-    control_right_motor_backward(right_speed);
-  }
-  else if( x == 0 ){
-    if( y > 0 ){
-      forward(255);
-    }
-    else{
-      backward(255);
-    }
-  }
-  else if( y == 0 ){
-    if( x > 0 ){
-      right(255);
-    }
-    else{
-      left(255);
-    }
-  }  
+    return speeds;
 }
+
 
 
 void forward(int speed) {
