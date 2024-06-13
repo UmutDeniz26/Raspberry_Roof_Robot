@@ -9,7 +9,9 @@ def camera_stream_start(port=5000):
     app = Flask(__name__)
     
     camera = Picamera2()
-    camera.configure(camera.create_preview_configuration(main={"format": 'XRGB8888', "size": (640, 480)}))
+    # Verbose should be False to avoid printing the camera configuration
+    camera.verbose = False
+    camera.configure(camera.create_preview_configuration(main={"format": 'XRGB8888', "size": (800, 606)}) )
     camera.start()
 
     @app.route('/video_feed')
