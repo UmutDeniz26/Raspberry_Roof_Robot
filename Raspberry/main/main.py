@@ -124,8 +124,6 @@ class Raspberry_Server:
             message = Common.convert_to_dict(    
                     message_raw["Command"], message_raw["Type"], message_raw["X"], message_raw["Y"]
                 )
-
-
         return message
     
 
@@ -191,11 +189,6 @@ class Raspberry_Server:
             elif math.fabs(time.time() - hold) > 0.7:
                 return "{'information': 'Waiting for response is disabled.'}"
 
-    def get_distance_from_sensor(self) -> int:
-        max_distance = get_max_distance('Modules/Distance_Sensor/VL53L3CX_rasppi/vl53l3cx_ranging_output.txt')
-        return max_distance
-
-
     def get_message_from_client(self, conn) -> str:
         """
             Get a message from the client.
@@ -220,7 +213,6 @@ class Raspberry_Server:
             The main loop of the server.
         """
 
-
         while True:    
             print("Waiting for a connection...")
             conn, addr = self.socket.accept()
@@ -232,7 +224,7 @@ class Raspberry_Server:
                     try:
                         # Start the distance measurement
                         if  "time_hold" not in locals() or time.time() - time_hold > 1:
-                            max_distance = self.get_distance_from_sensor()
+                            max_distance = get_max_distance('Modules/Distance_Sensor/VL53L3CX_rasppi/vl53l3cx_ranging_output.txt')
                             print("Max distance is ", max_distance)
                             time_hold = time.time()
 
