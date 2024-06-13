@@ -5,8 +5,8 @@ import re
 import keyboard
 import select
 
-HOST = "192.168.19.243"
-PORT = 5001
+HOST = "192.168.32.243"
+PORT = 5000
 
 
 def dict_creater(type_, command, X=0.0, Y=0.0):

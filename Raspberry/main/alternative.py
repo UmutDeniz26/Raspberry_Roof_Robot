@@ -273,6 +273,10 @@ class Raspberry_Server( Common_Operations ):
                         # Decode the data and convert to json dict.
                         print(f"Data received from client: {received_data }")
                         
+                        if not hasattr(self.serial_port_operations, 'ser'):
+                            print("Serial port is not available, skipping the transmission.")
+                            continue
+
                         # Transmit the data to the Arduino and receive the response
                         response_from_arduino = self.serial_port_operations.transmit_and_receive(received_data)
 
