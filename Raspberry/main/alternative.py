@@ -58,7 +58,6 @@ class Serial_Port_Operations(Common_Operations):
         :param baud_rate: Baud rate
         """
         super().__init__()
-        self.init_serial_port(baud_rate, dev)
     
     def init_serial_port(self, baud_rate, dev ):
         try:
@@ -238,6 +237,7 @@ class Raspberry_Server( Common_Operations ):
         super().__init__()
         
         # Composition of classes
+        self.HOST = HOST; self.PORT = PORT; self.SERIAL_PORT_DEVICE = dev; self.SERIAL_PORT_BAUD_RATE = baud_rate
         self.server_operations = Client_Server_Operations(HOST, PORT)
         self.serial_port_operations = Serial_Port_Operations(dev, baud_rate)
 
@@ -245,8 +245,22 @@ class Raspberry_Server( Common_Operations ):
         self.server_operations.init_server(HOST, PORT)
         self.serial_port_operations.init_serial_port(baud_rate, dev)
 
+        self.print_features()
+    
         # Run the server
         self.run()
+
+
+    def print_features(self) -> None:
+        """
+            Print the features of the server.
+        """
+        print("\nServer features:")   
+        print(f"  Serving on {self.HOST}:{self.PORT}")
+        print(f"  Serial port status:","Active" if hasattr(self.serial_port_operations, 'ser') else "Inactive")
+        print(f"  Serial port on {self.SERIAL_PORT_DEVICE} with baud rate {self.SERIAL_PORT_BAUD_RATE}")
+        print()
+
 
     def run(self):
         """
@@ -290,7 +304,7 @@ class Raspberry_Server( Common_Operations ):
             except Exception as e:
                 print("An error occurred: ", e)
                 traceback.print_exc()
-                break        
+                continue
 
 # Main function
 if __name__ == "__main__":

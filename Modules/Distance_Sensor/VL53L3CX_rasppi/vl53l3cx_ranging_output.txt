@@ -1,0 +1,16 @@
+{"initial_entry": "Clearing the old file"}
+{"Count": 149, "#Objs": 1, "Objects": [{"status": 0, "D": 92, "S": 134144, "Signal": 12.12, "Ambient": 0.12}]}
+{"Count": 150, "#Objs": 1, "Objects": [{"status": 0, "D": 97, "S": 117760, "Signal": 13.18, "Ambient": 0.12}]}
+{"Count": 151, "#Objs": 1, "Objects": [{"status": 0, "D": 98, "S": 126464, "Signal": 13.39, "Ambient": 0.13}]}
+{"Count": 152, "#Objs": 1, "Objects": [{"status": 0, "D": 96, "S": 93696, "Signal": 13.64, "Ambient": 0.12}]}
+{"Count": 153, "#Objs": 1, "Objects": [{"status": 0, "D": 97, "S": 100352, "Signal": 13.70, "Ambient": 0.13}]}
+{"Count": 154, "#Objs": 1, "Objects": [{"status": 0, "D": 85, "S": 77312, "Signal": 22.81, "Ambient": 0.12}]}
+{"Count": 155, "#Objs": 1, "Objects": [{"status": 0, "D": 52, "S": 79360, "Signal": 76.66, "Ambient": 0.13}]}
+{"Count": 156, "#Objs": 1, "Objects": [{"status": 0, "D": 34, "S": 74240, "Signal": 109.25, "Ambient": 0.12}]}
+{"Count": 157, "#Objs": 1, "Objects": [{"status": 0, "D": 23, "S": 81408, "Signal": 86.98, "Ambient": 0.04}]}
+{"Count": 158, "#Objs": 1, "Objects": [{"status": 0, "D": 72, "S": 88576, "Signal": 33.09, "Ambient": 0.04}]}
+{"Count": 159, "#Objs": 0, "Objects": []}
+{"Count": 160, "#Objs": 0, "Objects": []}
+{"Count": 161, "#Objs": 0, "Objects": []}
+{"Count": 162, "#Objs": 0, "Objects": []}
+{"Count": 162, "#Objs": 0, "Objects": []}
