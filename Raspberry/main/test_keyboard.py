@@ -5,8 +5,8 @@ import re
 import keyboard
 import select
 
-HOST = "192.168.32.243"
-PORT = 5001
+HOST = "192.168.1.13"
+PORT = 5000
 
 
 def dict_creater(input_dict):
@@ -15,12 +15,10 @@ def dict_creater(input_dict):
         ret = "{\"Type\": \"" + input_dict["Type"] + "\", \"Command\": \"" + input_dict["Command"] + "\"}\n"
         
     elif input_dict["Type"] == "robot_move":
-        ret = "{\"Type\": \"" + input_dict["Type"] + "\", \"Command\": \"" + input_dict["Command"] + "\"," + "\"X\": " 
-        + str(input_dict["X"]) + ", \"Y\": " + str(input_dict["Y"]) + "}\n"
+        ret = "{\"Type\": \"" + input_dict["Type"] + "\", \"Command\": \"" + input_dict["Command"] + "\"," + "\"X\": " + str(input_dict["X"]) + ", \"Y\": " + str(input_dict["Y"]) + "}\n"
         
     elif input_dict["Type"] == "camera_move":
-        ret = "{\"Type\": \"" + input_dict["Type"] + "\", \"Command\": \"" + input_dict["Command"] + "\"," + "\"axis\": " 
-        + str(input_dict["axis"]) + ", \"direction\": " + str(input_dict["direction"]) + "}\n"
+        ret = "{\"Type\": \"" + input_dict["Type"] + "\", \"Command\": \"" + input_dict["Command"] + "\"," + "\"axis\": " + str(input_dict["axis"]) + ", \"direction\": " + str(input_dict["direction"]) + "}\n"
 
     return ret
 
@@ -63,21 +61,21 @@ def main():
             # GPS Controls
             elif keyboard.is_pressed('g'):
                 key = 'g'
-                message = dict_creater("gps", "get")
+                message = dict_creater({"Type": "gps", "Command": "*"}) #{"Type": "gps", "Command": "*"}
             
             # Camera Controls
             elif keyboard.is_pressed('z'):
                 key = 'z'
-                message = dict_creater("camera_move", "move", 0, 1)
+                message = dict_creater({"Type": "camera_move", "Command": "move", "axis": 0, "direction": 1}) #{"Type": "camera_move", "Command": "move", "axis": 0, "direction": 1}
             elif keyboard.is_pressed('x'):
                 key = 'x'
-                message = dict_creater("camera_move", "move", 0, 0)
+                message = dict_creater({"Type": "camera_move", "Command": "move", "axis": 0, "direction": 0}) #{"Type": "camera_move", "Command": "move", "axis": 0, "direction": 0}
             elif keyboard.is_pressed('c'):
                 key = 'c'
-                message = dict_creater("camera_move", "move", 1, 1)
+                message = dict_creater({"Type": "camera_move", "Command": "move", "axis": 1, "direction": 1}) #{"Type": "camera_move", "Command": "move", "axis": 1, "direction": 1}
             elif keyboard.is_pressed('v'):
                 key = 'v'
-                message = dict_creater("camera_move", "move", 1, 0)
+                message = dict_creater({"Type": "camera_move", "Command": "move", "axis": 1, "direction": 0}) #{"Type": "camera_move", "Command": "move", "axis": 1, "direction": 0
 
             # Exit
             elif keyboard.is_pressed('q'):
@@ -86,10 +84,10 @@ def main():
                 s.close()
                 return
             else:
-                message = dict_creater("robot_move", "stop", x, y)
+                message = dict_creater({"Type": "robot_move", "Command": "stop", "X": 0, "Y": 0})
 
             if message == None:
-                message = dict_creater("robot_move", "move", x, y)
+                message = dict_creater({"Type": "robot_move", "Command": "move", "X": x, "Y": y})
                 time.sleep(0.1)
 
             if (hold_X == x and hold_Y == y) and hold_message == message:
