@@ -45,8 +45,13 @@ class Common_Operations:
             return {
                 "Command": input_dict["Command"],
                 "Type": input_dict["Type"],
-                "axis": 1 if input_dict["axis"] > 1 else 0,
-                "direction": 1 if input_dict["direction"] > 1 else 0
+                "axis": 1 if input_dict["axis"] > 0 else 0,
+                "direction": 1 if input_dict["direction"] > 0 else 0
+            }
+        elif input_dict["Type"] == "gps":
+            return {
+                "Command": input_dict["Command"],
+                "Type": input_dict["Type"]
             }
     
 
@@ -72,8 +77,10 @@ class Serial_Port_Operations(Common_Operations):
 
     def write_to_port(self, data:str, ready_to_send=True):
         # Write the data to the serial port
-        if type(data) != str:
-            print("Data should be in string format")
+        if type(data) == bytes:
+            data = data.decode('utf-8')
+        elif type(data) != str:
+            print("Data should be in string or byte format its type and value is: ", type(data), data)
             return
         
         if ready_to_send == False:
@@ -81,13 +88,19 @@ class Serial_Port_Operations(Common_Operations):
             data = self.dict_to_str(data)
             data = data.encode()
 
+        if type(data) == str:
+            data = data.encode('utf-8')
+        print("Data sent to Arduino: ", data)
         self.ser.write( data )
 
     def read_from_port(self):
         # Read the data from the serial port
-        return self.ser.readline().decode('utf-8').rstrip()
-    
-    def transmit_and_receive(self, message:str, timeout=1):
+        try:
+            return self.ser.readline().decode('utf-8').rstrip()
+        except Exception as e:
+            print("An error occurred while reading from the serial port: ", e)
+            return self.ser.readline()
+    def transmit_and_receive(self, message:str, timeout=5):
         """
         Transmit the data to the serial port until the response is received
         :param data: Data to transmit
