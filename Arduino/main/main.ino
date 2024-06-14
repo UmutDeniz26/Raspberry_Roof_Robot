@@ -1,4 +1,3 @@
-#include <Adafruit_MPU6050.h>
 #include <ArduinoJson.h>
 #include <SoftwareSerial.h>
 #include <Servo.h>
@@ -13,42 +12,29 @@ const int enb = 10; // Motor B
 const int in3 = 8; // Controls direction of Motor B
 const int in4 = 9; // Controls direction of Motor B
 
+const unsigned long motor_time_out = 5000; // Interval for motor stop
+
 //Servo PINS
-const int servoHorizontalPin = 5;
-const int servoVerticalPin = 3;
+const int servoHorizontalPin = 3;
+const int servoVerticalPin = 5;
 
 Servo servoHorizontal;
 Servo servoVertical;
 
 // Servo configuration
-int step_angle = 10;
-int min_horizontal_angle = 45;
-int max_horizontal_angle = 135;
-int min_vertical_angle = 45;
-int max_vertical_angle = 135;
+int step_angle = 20;
+int min_horizontal_angle = 0;
+int max_horizontal_angle = 180;
+int min_vertical_angle = 0;
+int max_vertical_angle = 180;
 
 int horizontal_position = 90;
 int vertical_position = 90;
 
-//Adafruit_MPU6050 mpu;
-
-unsigned long previousTimeMotor = 0;
-const unsigned long motor_time_out = 5000; // Interval for motor movements
-
-unsigned long previousTimeMPU = 0;
-const unsigned long mpuInterval = 5000; // Interval for MPU6050 readings
 
 int RXPin = 0;
 int TXPin = 2;
 SoftwareSerial gpsSerial(RXPin, TXPin);
-
-// Data structure for MPU6050 readings
-struct MPUData
-{
-  float accelX; float accelY; float accelZ;
-  float gyroX;  float gyroY;  float gyroZ;
-  float temp;
-};
 
 // Function prototypes
 void forward(int speed);
@@ -65,12 +51,7 @@ struct MotorSpeeds {
 
 MotorSpeeds detailed_direction_motor_control(float x, float y);
 
-
 String readGPSData();
-struct MPUData getMPUData();
-void printMPUData(MPUData data);
-
-
 
 void setup() {
   // Set the motor pins as Output
@@ -144,47 +125,55 @@ void loop() {
         int axis = doc["axis"];
         int direction = doc["direction"];
 
+        //
+        bool valid_flag = false;
+
         // Move the camera
         if (axis == 0) {
           // Horizontal
           if (direction == 0) {
             // Move left
-            horizontal_position = horizontal_position - step_angle;
+            if (horizontal_position - step_angle >= min_horizontal_angle) {
+              horizontal_position = horizontal_position - step_angle;
+              valid_flag = true;
+            }
           } else {
             // Move right
-            horizontal_position = horizontal_position + step_angle;
+            if (horizontal_position + step_angle <= max_horizontal_angle) {
+              horizontal_position = horizontal_position + step_angle;
+              valid_flag = true;
+            }
           }
-          
-          // Check if the angle is within the limits.
-          // If it is smaller than the min angle, set it to the min angle, if it is larger than the max angle, set it to the max angle
-          horizontal_position = horizontal_position < min_horizontal_angle ? min_horizontal_angle : horizontal_position;
-          horizontal_position = horizontal_position > max_horizontal_angle ? max_horizontal_angle : horizontal_position;
-          
+
         } else {
           // Vertical
           if (direction == 0) {
             // Move up
-            vertical_position = vertical_position - step_angle;
+            if (vertical_position - step_angle >= min_vertical_angle) {
+              vertical_position = vertical_position - step_angle;
+              valid_flag = true;
+            }
             
           } else {
             // Move down
-            vertical_position = vertical_position + step_angle;
-            
+            if (vertical_position + step_angle <= max_vertical_angle) {
+              vertical_position = vertical_position + step_angle;
+              valid_flag = true;
+            }
           }
-
-          // Check if the angle is within the limits.
-          // If it is smaller than the min angle, set it to the min angle, if it is larger than the max angle, set it to the max angle
-          vertical_position = vertical_position < min_vertical_angle ? min_vertical_angle : vertical_position;
-          vertical_position = vertical_position > max_vertical_angle ? max_vertical_angle : vertical_position;
-
         }     
-    
-
-        // Use current angles to update the new angles
-        // Move the servo to the new angles
-        servoHorizontal.write(horizontal_position);
-        servoVertical.write(vertical_position);
-
+        
+        // Move the servo to the target position if the position is new
+        if ( valid_flag ) {
+          if (axis == 0) {
+            // Horizontal
+            servoHorizontal.write(horizontal_position);
+          } else {
+            // Vertical
+            servoVertical.write(vertical_position);
+          }
+        }
+        
         return_output = "{\"axis\": "+String(axis)+", \"direction\": "+String(direction)+
           ", \"horizontal_position\": "+String(horizontal_position)+", \"vertical_position\": "+String(vertical_position)+"}";
 
@@ -208,17 +197,8 @@ void loop() {
     hold_last_movement = currentTime;
     stop();
   }
-
-  // Check for MPU6050 readings
-  /*
-  else if (currentTime - previousTimeMPU >= mpuInterval) {
-    MPUData data = getMPUData();
-    printMPUData(data);
-    Serial.println("0");
-    previousTimeMPU = currentTime;
-  }
-  */
 }
+
 
 void stop() {
   //STOP
@@ -427,50 +407,6 @@ void backward(int speed) {
   digitalWrite(in4, LOW);
   analogWrite(enb, speed);
 }
-
-/*
-// Get MPU6050 readings
-MPUData getMPUData()
-{
-  sensors_event_t a, g, temp;
-  mpu.getEvent(&a, &g, &temp);
-
-  MPUData data;
-  data.accelX = a.acceleration.x ;//+ 8.80; //Configuration
-  data.accelY = a.acceleration.y ;//- 2.30; //Configuration
-  data.accelZ = a.acceleration.z ;//+ 3.20; //Configuration
-  data.gyroX = g.gyro.x;
-  data.gyroY = g.gyro.y;
-  data.gyroZ = g.gyro.z;
-  data.temp = temp.temperature;
-
-  return data;
-}
-
-// Print MPU6050 readings
-void printMPUData(MPUData data)
-{
-  Serial.print("Acceleration X: ");
-  Serial.print(data.accelX);
-  Serial.print(", Y: ");
-  Serial.print(data.accelY);
-  Serial.print(", Z: ");
-  Serial.print(data.accelZ);
-  Serial.print(" m/s^2 ---");
-
-  Serial.print("Rotation X: ");
-  Serial.print(data.gyroX);
-  Serial.print(", Y: ");
-  Serial.print(data.gyroY);
-  Serial.print(", Z: ");
-  Serial.print(data.gyroZ);
-  Serial.print(" rad/s ---");
-
-  Serial.print("Temperature: ");
-  Serial.print(data.temp);
-  Serial.print(" degC ---");
-}
-*/
 
 String readGPSData()
 {
