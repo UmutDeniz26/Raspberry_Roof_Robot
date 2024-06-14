@@ -1,6 +1,8 @@
 #include <Adafruit_MPU6050.h>
 #include <ArduinoJson.h>
 #include <SoftwareSerial.h>
+#include <Servo.h>
+
 
 //MOTOR Driver PINS
 const int ena = 4; // Motor A
@@ -13,9 +15,10 @@ const int in4 = 9; // Controls direction of Motor B
 
 //Servo PINS
 const int servoHorizontalPin = 5;
-const int servoHorizontalPin = 3;
+const int servoVerticalPin = 3;
 
-Servo servoHorizontal, servoVertical;
+Servo servoHorizontal;
+Servo servoVertical;
 
 // Servo configuration
 int step_angle = 10;
