@@ -26,7 +26,7 @@ class Common_Operations:
             print("Error converting string to dictionary : ", data_str)
             return {}
 
-    def dict_to_str( data: dict ) -> str:
+    def dict_to_str(  self, data: dict ) -> str:
         try:
             return json.dumps(data) + "\n"
         except:
@@ -202,6 +202,9 @@ class Client_Server_Operations(Common_Operations):
             return None
         
         # Send the message to the client
+        if type(message) == dict:
+            message = self.dict_to_str(message)
+            
         self.conn.sendall(message.encode('utf-8'))
     
     def wait_connection(self):
