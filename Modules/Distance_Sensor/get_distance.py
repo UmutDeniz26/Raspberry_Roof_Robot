@@ -7,13 +7,16 @@ def get_distance(output_path):
         try:
             return str_to_json(data[-1])
         except:
-            time.sleep(0.5)
+            time.sleep(0.2)
             try:
                 return str_to_json(data[-1])
             except:
                 return {'error': 'No data found'}
 def get_max_distance(output_path):
-    objects = get_distance(output_path)['Objects']
+    try:
+        objects = get_distance(output_path)['Objects']
+    except:
+        return 0
     if len(objects) == 0:
         return 0
     return max(objects, key=lambda x: x['D'])['D']

@@ -185,7 +185,6 @@ void ClearTxtFile(const char *output_file_path)
     printf("Error opening file!\n");
     return;
   }
-  fprintf(output_file, "{\"initial_entry\": \"Clearing the old file\"}\n");
   fclose(output_file); // Close the file when done
 }
 
@@ -206,7 +205,6 @@ void RangingLoop(const char *output_file_path)
   uint8_t NewDataReady=0;
   int no_of_object_found=0,j;
   char *json_string;
-  fprintf(output_file, "{\"initial_entry\": \"Ranging loop starts\"}\n");
   printf("Ranging loop starts\n");
   
   status = VL53LX_WaitDeviceBooted(Dev);
@@ -263,7 +261,6 @@ void RangingLoop(const char *output_file_path)
           printf("Error opening file!\n");
           return;
         }
-        fprintf(output_file, "{\"initial_entry\": \"Clearing the old file\"}\n");
       }
 
       if (status==0){
