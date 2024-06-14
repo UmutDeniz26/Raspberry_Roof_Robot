@@ -32,21 +32,21 @@ class Common_Operations:
         except:
             raise ValueError("Error converting dictionary to string.")
 
-    def client_to_arduino_wrapper( Command, Type, X=None, Y=None, axis=None, direction=None ) -> dict:
+    def client_to_arduino_wrapper( input_dict ) -> dict:
         
-        if Type == "robot_move":
+        if input_dict["Type"] == "robot_move":
             return {
-                "Command": Command,
-                "Type": Type,
-                "X": X,
-                "Y": Y
+                "Command": input_dict["Command"],
+                "Type": input_dict["Type"],
+                "X": input_dict["X"],
+                "Y": input_dict["Y"]
             }
-        elif Type == "servo_control":
+        elif input_dict["Type"] == "camera_move":
             return {
-                "Command": Command,
-                "Type": Type,
-                "axis": 1 if axis > 1 else 0,
-                "direction": 1 if direction > 1 else 0
+                "Command": input_dict["Command"],
+                "Type": input_dict["Type"],
+                "axis": 1 if input_dict["axis"] > 1 else 0,
+                "direction": 1 if input_dict["direction"] > 1 else 0
             }
     
 
@@ -290,14 +290,12 @@ class Raspberry_Server( Common_Operations ):
                         received_data = self.server_operations.get_message_from_client()
                         if received_data is None:
                             continue
+                        print(f"Data received from client: {received_data }")
                         
                         # Get the max distance
                         max_distance = get_max_distance( 'Modules/Distance_Sensor/VL53L3CX_rasppi/vl53l3cx_ranging_output.txt' )
                         print("Max distance is ", max_distance)
                             
-
-                        # Decode the data and convert to json dict.
-                        print(f"Data received from client: {received_data }")
                         
                         if not hasattr(self.serial_port_operations, 'ser'):
                             print("Serial port is not available, skipping the transmission.")
