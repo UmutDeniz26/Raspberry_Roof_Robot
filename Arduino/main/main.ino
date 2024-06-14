@@ -11,6 +11,22 @@ const int enb = 10; // Motor B
 const int in3 = 8; // Controls direction of Motor B
 const int in4 = 9; // Controls direction of Motor B
 
+//Servo PINS
+const int servoHorizontalPin = 5;
+const int servoHorizontalPin = 3;
+
+Servo servoHorizontal, servoVertical;
+
+// Servo configuration
+int step_angle = 10;
+int min_horizontal_angle = 45;
+int max_horizontal_angle = 135;
+int min_vertical_angle = 45;
+int max_vertical_angle = 135;
+
+int horizontal_position = 90;
+int vertical_position = 90;
+
 //Adafruit_MPU6050 mpu;
 
 unsigned long previousTimeMotor = 0;
@@ -51,6 +67,8 @@ String readGPSData();
 struct MPUData getMPUData();
 void printMPUData(MPUData data);
 
+
+
 void setup() {
   // Set the motor pins as Output
   pinMode(ena, OUTPUT);
@@ -62,6 +80,12 @@ void setup() {
 
   gpsSerial.begin(9600);
   Serial.begin(19200);
+
+  
+  // Set the servo pins as Output
+  servoHorizontal.attach(servoHorizontalPin);
+  servoVertical.attach(servoVerticalPin);
+
 
   /*
   // Initialize MPU6050
@@ -101,12 +125,6 @@ void loop() {
       
       // Check the type of command
       if (type == "robot_move"){
-        /*
-        if (command == "stop"){
-          stop();
-          return_output = "{\"Command\": \"stop\"}";
-        }
-        */
         // Get the speed, x and y values
         
         float x = doc["X"];
@@ -117,6 +135,56 @@ void loop() {
         return_output = "{\"X\": "+String(x)+", \"Y\": "+String(y)+", \"Left Speed\": "+String(speeds.left_speed)+", \"Right Speed\": "+String(speeds.right_speed)+"}";
         hold_last_movement = currentTime;
       
+      }
+      else if(type == "camera_move"){
+        // Get the axis and direction values
+        int axis = doc["axis"];
+        int direction = doc["direction"];
+
+        // Move the camera
+        if (axis == 0) {
+          // Horizontal
+          if (direction == 0) {
+            // Move left
+            horizontal_position = horizontal_position - step_angle;
+          } else {
+            // Move right
+            horizontal_position = horizontal_position + step_angle;
+          }
+          
+          // Check if the angle is within the limits.
+          // If it is smaller than the min angle, set it to the min angle, if it is larger than the max angle, set it to the max angle
+          horizontal_position = horizontal_position < min_horizontal_angle ? min_horizontal_angle : horizontal_position;
+          horizontal_position = horizontal_position > max_horizontal_angle ? max_horizontal_angle : horizontal_position;
+          
+        } else {
+          // Vertical
+          if (direction == 0) {
+            // Move up
+            vertical_position = vertical_position - step_angle;
+            
+          } else {
+            // Move down
+            vertical_position = vertical_position + step_angle;
+            
+          }
+
+          // Check if the angle is within the limits.
+          // If it is smaller than the min angle, set it to the min angle, if it is larger than the max angle, set it to the max angle
+          vertical_position = vertical_position < min_vertical_angle ? min_vertical_angle : vertical_position;
+          vertical_position = vertical_position > max_vertical_angle ? max_vertical_angle : vertical_position;
+
+        }     
+    
+
+        // Use current angles to update the new angles
+        // Move the servo to the new angles
+        servoHorizontal.write(horizontal_position);
+        servoVertical.write(vertical_position);
+
+        return_output = "{\"axis\": "+String(axis)+", \"direction\": "+String(direction)+
+          ", \"horizontal_position\": "+String(horizontal_position)+", \"vertical_position\": "+String(vertical_position)+"}";
+
       }
       else if(type=="gps"){
         GPS_data = readGPSData();

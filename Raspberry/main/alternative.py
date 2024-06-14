@@ -18,17 +18,6 @@ from Modules.Camera.camera_stream import camera_stream_start
 class Common_Operations:
     def __init__(self):
         pass
-
-    def arduino_message_wrapper(self, input_data):
-        """
-        Wraps the input data into a dictionary format that is understandable by the Arduino
-        :param input_data: Input data
-        :return: Wrapped data
-        """
-
-        return self.convert_to_dict(
-            input_data["Command"], input_data["Type"], input_data["X"], input_data["Y"]
-        )
     
     def str_to_json_dict( data_str: str ) -> dict:
         try:
@@ -43,12 +32,21 @@ class Common_Operations:
         except:
             raise ValueError("Error converting dictionary to string.")
 
-    def convert_to_dict( Command, Type, X=None, Y=None):
-        return {
-                "Type": Type,
+    def client_to_arduino_wrapper( Command, Type, X=None, Y=None, axis=None, direction=None ) -> dict:
+        
+        if Type == "robot_move":
+            return {
                 "Command": Command,
+                "Type": Type,
                 "X": X,
                 "Y": Y
+            }
+        elif Type == "servo_control":
+            return {
+                "Command": Command,
+                "Type": Type,
+                "axis": 1 if axis > 1 else 0,
+                "direction": 1 if direction > 1 else 0
             }
     
 
@@ -79,7 +77,7 @@ class Serial_Port_Operations(Common_Operations):
             return
         
         if ready_to_send == False:
-            data = self.arduino_message_wrapper( self.str_to_json_dict(data) )
+            data = self.client_to_arduino_wrapper( self.str_to_json_dict(data) )
             data = self.dict_to_str(data)
             data = data.encode()
 
@@ -110,7 +108,7 @@ class Serial_Port_Operations(Common_Operations):
         self.reset_buffers()
 
         # Prepare the data to be sent
-        message = self.arduino_message_wrapper( self.str_to_json_dict(message) )
+        message = self.client_to_arduino_wrapper( self.str_to_json_dict(message) )
         message = self.dict_to_str(message)
         message = message.encode()
 
@@ -128,17 +126,6 @@ class Serial_Port_Operations(Common_Operations):
             elif time.time() - time_hold > timeout:
                 return { "Error": "Timeout" }
             
-
-    def arduino_message_wrapper(self, input_data):
-        """
-        Wraps the input data into a dictionary format that is understandable by the Arduino
-        :param input_data: Input data
-        :return: Wrapped data
-        """
-
-        return self.convert_to_dict(
-            input_data["Command"], input_data["Type"], input_data["X"], input_data["Y"]
-        )
 
     def reset_buffers(self):
         """
