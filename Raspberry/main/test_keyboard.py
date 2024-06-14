@@ -19,7 +19,7 @@ def dict_creater(input_dict):
         
     elif input_dict["Type"] == "camera_move":
         ret = "{\"Type\": \"" + input_dict["Type"] + "\", \"Command\": \"" + input_dict["Command"] + "\"," + "\"axis\": " + str(input_dict["axis"]) + ", \"direction\": " + str(input_dict["direction"]) + "}\n"
-
+        # Example: {"Type": "camera_move", "Command": "move", "axis": 0, "direction": 1}
     return ret
 
 def main():
@@ -67,16 +67,20 @@ def main():
             elif keyboard.is_pressed('z'):
                 key = 'z'
                 message = dict_creater({"Type": "camera_move", "Command": "move", "axis": 0, "direction": 1}) #{"Type": "camera_move", "Command": "move", "axis": 0, "direction": 1}
+                time.sleep(0.3)
             elif keyboard.is_pressed('x'):
                 key = 'x'
                 message = dict_creater({"Type": "camera_move", "Command": "move", "axis": 0, "direction": 0}) #{"Type": "camera_move", "Command": "move", "axis": 0, "direction": 0}
+                time.sleep(0.3)
             elif keyboard.is_pressed('c'):
                 key = 'c'
                 message = dict_creater({"Type": "camera_move", "Command": "move", "axis": 1, "direction": 1}) #{"Type": "camera_move", "Command": "move", "axis": 1, "direction": 1}
+                time.sleep(0.3)
             elif keyboard.is_pressed('v'):
                 key = 'v'
                 message = dict_creater({"Type": "camera_move", "Command": "move", "axis": 1, "direction": 0}) #{"Type": "camera_move", "Command": "move", "axis": 1, "direction": 0
-
+                time.sleep(0.3)
+                
             # Exit
             elif keyboard.is_pressed('q'):
                 key = 'q'
@@ -95,7 +99,6 @@ def main():
                 continue
             else:
                 time.sleep(0.1)
-            print(f"X: {x}, Y: {y}", "Message: ", message)
 
             hold_X = x
             hold_Y = y
