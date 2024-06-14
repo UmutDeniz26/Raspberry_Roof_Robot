@@ -30,20 +30,20 @@ class Common_Operations:
             input_data["Command"], input_data["Type"], input_data["X"], input_data["Y"]
         )
     
-    def str_to_json_dict( data_str: str ) -> dict:
+    def str_to_json_dict( self, data_str: str ) -> dict:
         try:
             return json.loads(data_str)
         except:
             print("Error converting string to dictionary : ", data_str)
             return {}
 
-    def dict_to_str( data: dict ) -> str:
+    def dict_to_str(  self, data: dict ) -> str:
         try:
             return json.dumps(data) + "\n"
         except:
             raise ValueError("Error converting dictionary to string.")
 
-    def convert_to_dict( Command, Type, X=None, Y=None):
+    def convert_to_dict( self, Command, Type, X=None, Y=None):
         return {
                 "Type": Type,
                 "Command": Command,
@@ -215,6 +215,9 @@ class Client_Server_Operations(Common_Operations):
             return None
         
         # Send the message to the client
+        if type(message) == dict:
+            message = self.dict_to_str(message)
+            
         self.conn.sendall(message.encode('utf-8'))
     
     def wait_connection(self):
