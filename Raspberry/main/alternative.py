@@ -19,7 +19,7 @@ class Common_Operations:
     def __init__(self):
         pass
     
-    def str_to_json_dict( data_str: str ) -> dict:
+    def str_to_json_dict( self, data_str: str ) -> dict:
         try:
             return json.loads(data_str)
         except:
@@ -32,7 +32,7 @@ class Common_Operations:
         except:
             raise ValueError("Error converting dictionary to string.")
 
-    def client_to_arduino_wrapper( input_dict ) -> dict:
+    def client_to_arduino_wrapper( self, input_dict ) -> dict:
         
         if input_dict["Type"] == "robot_move":
             return {
