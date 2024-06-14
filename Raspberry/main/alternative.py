@@ -18,19 +18,8 @@ from Modules.Camera.camera_stream import camera_stream_start
 class Common_Operations:
     def __init__(self):
         pass
-
-    def arduino_message_wrapper(self, input_data):
-        """
-        Wraps the input data into a dictionary format that is understandable by the Arduino
-        :param input_data: Input data
-        :return: Wrapped data
-        """
-
-        return self.convert_to_dict(
-            input_data["Command"], input_data["Type"], input_data["X"], input_data["Y"]
-        )
     
-    def str_to_json_dict( self, data_str: str ) -> dict:
+    def str_to_json_dict( data_str: str ) -> dict:
         try:
             return json.loads(data_str)
         except:
@@ -43,12 +32,21 @@ class Common_Operations:
         except:
             raise ValueError("Error converting dictionary to string.")
 
-    def convert_to_dict( self, Command, Type, X=None, Y=None):
-        return {
-                "Type": Type,
-                "Command": Command,
-                "X": X,
-                "Y": Y
+    def client_to_arduino_wrapper( input_dict ) -> dict:
+        
+        if input_dict["Type"] == "robot_move":
+            return {
+                "Command": input_dict["Command"],
+                "Type": input_dict["Type"],
+                "X": input_dict["X"],
+                "Y": input_dict["Y"]
+            }
+        elif input_dict["Type"] == "camera_move":
+            return {
+                "Command": input_dict["Command"],
+                "Type": input_dict["Type"],
+                "axis": 1 if input_dict["axis"] > 1 else 0,
+                "direction": 1 if input_dict["direction"] > 1 else 0
             }
     
 
@@ -79,7 +77,7 @@ class Serial_Port_Operations(Common_Operations):
             return
         
         if ready_to_send == False:
-            data = self.arduino_message_wrapper( self.str_to_json_dict(data) )
+            data = self.client_to_arduino_wrapper( self.str_to_json_dict(data) )
             data = self.dict_to_str(data)
             data = data.encode()
 
@@ -110,7 +108,7 @@ class Serial_Port_Operations(Common_Operations):
         self.reset_buffers()
 
         # Prepare the data to be sent
-        message = self.arduino_message_wrapper( self.str_to_json_dict(message) )
+        message = self.client_to_arduino_wrapper( self.str_to_json_dict(message) )
         message = self.dict_to_str(message)
         message = message.encode()
 
@@ -128,17 +126,6 @@ class Serial_Port_Operations(Common_Operations):
             elif time.time() - time_hold > timeout:
                 return { "Error": "Timeout" }
             
-
-    def arduino_message_wrapper(self, input_data):
-        """
-        Wraps the input data into a dictionary format that is understandable by the Arduino
-        :param input_data: Input data
-        :return: Wrapped data
-        """
-
-        return self.convert_to_dict(
-            input_data["Command"], input_data["Type"], input_data["X"], input_data["Y"]
-        )
 
     def reset_buffers(self):
         """
@@ -272,7 +259,7 @@ class Raspberry_Server( Common_Operations ):
         print(f"  Serving on {self.HOST}:{self.PORT}")
         print(f"  Serial port status:","Active" if hasattr(self.serial_port_operations, 'ser') else "Inactive")
         print(f"  Serial port on {self.SERIAL_PORT_DEVICE} with baud rate {self.SERIAL_PORT_BAUD_RATE}")
-        print(f"  Camera Status:","Serving on {self.CAMERA_PORT}" if hasattr(self, 'thread') else "Inactive")
+        print(f"  Camera is serving on {self.CAMERA_PORT}")
         print()
 
 
@@ -306,14 +293,12 @@ class Raspberry_Server( Common_Operations ):
                         received_data = self.server_operations.get_message_from_client()
                         if received_data is None:
                             continue
+                        print(f"Data received from client: {received_data }")
                         
                         # Get the max distance
                         max_distance = get_max_distance( 'Modules/Distance_Sensor/VL53L3CX_rasppi/vl53l3cx_ranging_output.txt' )
                         print("Max distance is ", max_distance)
                             
-
-                        # Decode the data and convert to json dict.
-                        print(f"Data received from client: {received_data }")
                         
                         if not hasattr(self.serial_port_operations, 'ser'):
                             print("Serial port is not available, skipping the transmission.")

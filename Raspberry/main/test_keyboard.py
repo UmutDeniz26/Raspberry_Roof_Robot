@@ -9,8 +9,19 @@ HOST = "192.168.32.243"
 PORT = 5001
 
 
-def dict_creater(type_, command, X=0.0, Y=0.0):
-    ret = "{\"Type\": \"" + type_ + "\", \"Command\": \"" + command + "\"," + "\"X\": " + str(X) + ", \"Y\": " + str(Y) + "}\n"
+def dict_creater(input_dict):
+
+    if input_dict["Type"] == "gps":
+        ret = "{\"Type\": \"" + input_dict["Type"] + "\", \"Command\": \"" + input_dict["Command"] + "\"}\n"
+        
+    elif input_dict["Type"] == "robot_move":
+        ret = "{\"Type\": \"" + input_dict["Type"] + "\", \"Command\": \"" + input_dict["Command"] + "\"," + "\"X\": " 
+        + str(input_dict["X"]) + ", \"Y\": " + str(input_dict["Y"]) + "}\n"
+        
+    elif input_dict["Type"] == "camera_move":
+        ret = "{\"Type\": \"" + input_dict["Type"] + "\", \"Command\": \"" + input_dict["Command"] + "\"," + "\"axis\": " 
+        + str(input_dict["axis"]) + ", \"direction\": " + str(input_dict["direction"]) + "}\n"
+
     return ret
 
 def main():
@@ -31,6 +42,7 @@ def main():
             message = None
             key = ''
             
+            # Motor Controls
             if keyboard.is_pressed('s'):
                 y = -1#y-0.1 if y-0.1>-1 else -1.0
                 key = 's'
@@ -47,9 +59,27 @@ def main():
                 x = 0 if x>0 else x
                 y = 0
                 key = 'a'
+
+            # GPS Controls
             elif keyboard.is_pressed('g'):
                 key = 'g'
                 message = dict_creater("gps", "get")
+            
+            # Camera Controls
+            elif keyboard.is_pressed('z'):
+                key = 'z'
+                message = dict_creater("camera_move", "move", 0, 1)
+            elif keyboard.is_pressed('x'):
+                key = 'x'
+                message = dict_creater("camera_move", "move", 0, 0)
+            elif keyboard.is_pressed('c'):
+                key = 'c'
+                message = dict_creater("camera_move", "move", 1, 1)
+            elif keyboard.is_pressed('v'):
+                key = 'v'
+                message = dict_creater("camera_move", "move", 1, 0)
+
+            # Exit
             elif keyboard.is_pressed('q'):
                 key = 'q'
                 print("Exiting from the server...")
