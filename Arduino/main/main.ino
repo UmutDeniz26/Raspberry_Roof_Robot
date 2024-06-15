@@ -180,13 +180,13 @@ void camera_control(int axis, int direction, int horizontal_position, int vertic
   {
     // Horizontal
     servoHorizontal.write(horizontal_position);
-    delay(500); // Small delay to allow the servo to move
+    delay(50); // Small delay to allow the servo to move
   }
   else if (axis == 1)
   {
     // Vertical
     servoVertical.write(vertical_position);
-    delay(500); // Small delay to allow the servo to move
+    delay(50); // Small delay to allow the servo to move
   }
 }
 
@@ -444,6 +444,8 @@ String readGPSData()
   char c;
   String gpsData;
   unsigned long start_time = millis();
+
+  Serial.println("GPS READ");
 
   // Read GPS data if available
   while (gpsSerial.available() > 0)
