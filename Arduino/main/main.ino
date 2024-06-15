@@ -17,7 +17,7 @@ const int in4 = 9;  // Controls direction of Motor B
 const unsigned long motor_time_out = 5000; // Interval for motor stop
 
 // Servo PINS
-const int servoHorizontalPin = 3;
+const int servoHorizontalPin = 11;
 const int servoVerticalPin = 5;
 
 Servo servoHorizontal;
@@ -31,8 +31,8 @@ int min_vertical_angle = 0;
 int max_vertical_angle = 180;
 
 // GPS configuration
-int RXPin = 11;
-int TXPin = 12;
+int RXPin = 2;
+int TXPin = 3;
 SoftwareSerial gpsSerial(RXPin, TXPin);
 
 // Function prototypes
