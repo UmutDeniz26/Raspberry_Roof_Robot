@@ -445,8 +445,6 @@ String readGPSData()
   String gpsData;
   unsigned long start_time = millis();
 
-  Serial.println("GPS READ");
-
   // Read GPS data if available
   while (gpsSerial.available() > 0)
   {
