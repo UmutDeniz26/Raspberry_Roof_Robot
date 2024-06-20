@@ -270,7 +270,7 @@ class Raspberry_Server( Common_Operations ):
         """
         print("\nServer features:")   
         print(f"  Serving on {self.HOST}:{self.PORT}")
-        print(f"  Serial port status:","Active" if hasattr(self.serial_port_operations, 'ser') else "Inactive")
+        print(f"  Serial port status: ","Active" if hasattr(self.serial_port_operations, 'ser') else "Inactive")
         print(f"  Serial port on {self.SERIAL_PORT_DEVICE} with baud rate {self.SERIAL_PORT_BAUD_RATE}")
         print(f"  Camera is serving on {self.CAMERA_PORT}")
         print()
