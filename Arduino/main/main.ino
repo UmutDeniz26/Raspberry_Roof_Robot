@@ -4,6 +4,7 @@
 
 unsigned long currentTime = 0;
 unsigned long hold_last_movement = 0;
+unsigned long hold_gps_measure_time = 0;
 
 // MOTOR Driver PINS
 const int ena = 4; // Motor A
@@ -51,6 +52,7 @@ struct MotorSpeeds
 
 MotorSpeeds detailed_direction_motor_control(float x, float y);
 String readGPSData();
+const unsigned long gps_time_out = 10000;
 
 void setup()
 {
@@ -68,6 +70,9 @@ void setup()
 
   gpsSerial.begin(9600);
   Serial.begin(19200);
+
+  // First GPS measure
+  GPS_data = readGPSData();
 }
 
 String GPS_data, data, return_output;
@@ -121,7 +126,6 @@ void loop()
       }
       else if (type == "gps")
       {
-        GPS_data = readGPSData();
         return_output = "{\"gps\": " + GPS_data + "}";
       }
       // Add more commands here
@@ -140,6 +144,11 @@ void loop()
   {
     hold_last_movement = currentTime;
     stop();
+  }
+  else if (currentTime - hold_gps_measure_time >= gps_time_out)
+  {
+    hold_gps_measure_time = currentTime;
+    GPS_data = readGPSData();
   }
 }
 
@@ -448,10 +457,16 @@ String readGPSData()
   // Read GPS data if available
   while (gpsSerial.available() > 0)
   {
+    // if Serial port is available interrupt the loop
+    if (Serial.available() > 0)
+    {
+      return GPS_data;
+    }
+    
     // Break if time exceeds max_serial_time
     if (millis() - start_time > max_serial_time)
     {
-      break;
+      return GPS_data;
     }
     c = gpsSerial.read();
     if (c == '\n')
