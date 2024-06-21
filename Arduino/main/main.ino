@@ -15,7 +15,7 @@ const int enb = 10; // Motor B
 const int in3 = 8;  // Controls direction of Motor B
 const int in4 = 9;  // Controls direction of Motor B
 
-const unsigned long motor_time_out = 5000; // Interval for motor stop
+const unsigned long motor_time_out = 2000; // Interval for motor stop
 
 // Servo PINS
 const int servoHorizontalPin = 11;
