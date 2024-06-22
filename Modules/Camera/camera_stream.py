@@ -29,4 +29,4 @@ def camera_stream_start(port=5000):
     app.run(host='0.0.0.0', port = port)
 
 if __name__ == '__main__':
-    camera_stream_start( 5000 )
+    camera_stream_start( 8080 )

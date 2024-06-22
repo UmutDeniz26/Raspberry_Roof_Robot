@@ -5,7 +5,7 @@ import re
 import keyboard
 import select
 
-HOST = "192.168.1.13"
+HOST = "192.168.4.243"
 PORT = 5000
 
 

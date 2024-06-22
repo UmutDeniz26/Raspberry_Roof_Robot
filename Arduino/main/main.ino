@@ -7,9 +7,9 @@ unsigned long hold_last_movement = 0;
 unsigned long hold_gps_measure_time = 0;
 
 // MOTOR Driver PINS
-const int ena = 4; // Motor A
-const int in1 = 6; // Controls direction of Motor A
-const int in2 = 7; // Controls direction of Motor A
+const int ena = 7; // Motor A
+const int in1 = 4; // Controls direction of Motor A
+const int in2 = 6; // Controls direction of Motor A
 
 const int enb = 10; // Motor B
 const int in3 = 8;  // Controls direction of Motor B
@@ -53,6 +53,7 @@ struct MotorSpeeds
 MotorSpeeds detailed_direction_motor_control(float x, float y);
 String readGPSData();
 const unsigned long gps_time_out = 10000;
+String GPS_data, data, return_output;
 
 void setup()
 {
@@ -75,7 +76,6 @@ void setup()
   GPS_data = readGPSData();
 }
 
-String GPS_data, data, return_output;
 
 void loop()
 {
@@ -259,6 +259,7 @@ void control_right_motor_backward(int speed)
   digitalWrite(in4, HIGH);
   analogWrite(enb, speed);
 }
+
 // Move the robot in a detailed direction
 MotorSpeeds detailed_direction_motor_control(float x, float y)
 {
