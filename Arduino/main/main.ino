@@ -43,6 +43,7 @@ void left(int speed);
 void backward(int speed);
 void stop();
 void camera_control(int axis, int direction, int horizontal_position, int vertical_position);
+double map_Interval(double x);
 
 struct MotorSpeeds
 {
@@ -106,6 +107,9 @@ void loop()
 
         float x = doc["X"];
         float y = doc["Y"];
+
+        // Map the y value
+        y = map_Interval(y);
 
         MotorSpeeds speeds = detailed_direction_motor_control(x, y);
 
@@ -215,7 +219,7 @@ void control_left_motor_forward(int speed)
   speed = speed > 255 ? 255 : speed;
   speed = speed < 0 ? 0 : speed;
 
-  // MOTOR_A COUNTERCLOCKWISE MAX SPEED
+  // MOTOR_A CLOCKWISE
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);
   analogWrite(ena, speed);
@@ -228,10 +232,11 @@ void control_right_motor_forward(int speed)
   speed = speed > 255 ? 255 : speed;
   speed = speed < 0 ? 0 : speed;
 
-  // MOTOR_B CLOCKWISE MAX SPEED
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
+  // MOTOR_B CLOCKWISE
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
   analogWrite(enb, speed);
+  
 }
 
 void control_left_motor_backward(int speed)
@@ -241,7 +246,7 @@ void control_left_motor_backward(int speed)
   speed = speed > 255 ? 255 : speed;
   speed = speed < 0 ? 0 : speed;
 
-  // MOTOR_A CLOCKWISE MAX SPEED
+  // MOTOR_A Counter_CLOCKWISE
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
   analogWrite(ena, speed);
@@ -254,7 +259,7 @@ void control_right_motor_backward(int speed)
   speed = speed > 255 ? 255 : speed;
   speed = speed < 0 ? 0 : speed;
 
-  // MOTOR_B COUNTERCLOCKWISE MAX SPEED
+  // MOTOR_B COUNTERCLOCKWISE
   digitalWrite(in3, LOW);
   digitalWrite(in4, HIGH);
   analogWrite(enb, speed);
@@ -266,40 +271,26 @@ MotorSpeeds detailed_direction_motor_control(float x, float y)
   // X and Y are the coordinates of the joystick ( between -1 and 1 )
   // Speed is the speed of the motors ( between 0 and 255 )
   // The function will control the motors to move the robot in the direction of the joystick
-
-  int MIN_SPEED = 20;
-  int MAX_SPEED = 255;
-
-  int difference_min_max = MAX_SPEED - MIN_SPEED;
-
-  int MAX_SPEED_DIFF = difference_min_max * 1; // This coefficient can be adjusted to change the speed difference between the motors
-
   MotorSpeeds speeds = {0, 0};
 
   // If the joystick is in the middle, stop the robot
   if (x == 0 && y == 0)
   {
     stop();
+    speeds.left_speed = 0;
+    speeds.right_speed = 0;
   }
   // If the joystick is in the top right corner -> Forward Right
   else if (x > 0 && y > 0)
   {
     // Calculate the speed of the left motor
-    speeds.left_speed = MIN_SPEED + (difference_min_max * y) + (MAX_SPEED_DIFF / 2 * x);
+    speeds.left_speed = y * 255;
+    speeds.right_speed = speeds.left_speed * (1 - x) ;
 
-    if (speeds.left_speed > 255)
-    {
-      speeds.left_speed = 255;
-      speeds.right_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF * x);
-    }
-    else
-    {
-      // Calculate the speed of the right motor
-      speeds.right_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF / 2 * x);
-    }
 
     // Control the left motor
-    control_left_motor_forward(speeds.left_speed);
+    //control_left_motor_forward(speeds.left_speed);
+
     // Control the right motor
     control_right_motor_forward(speeds.right_speed);
   }
@@ -307,18 +298,8 @@ MotorSpeeds detailed_direction_motor_control(float x, float y)
   else if (x < 0 && y > 0)
   {
     // Calculate the speed of the left motor
-    speeds.right_speed = MIN_SPEED + (difference_min_max * y) + (MAX_SPEED_DIFF / 2 * -x);
-
-    if (speeds.right_speed > 255)
-    {
-      speeds.right_speed = 255;
-      speeds.left_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF * -x);
-    }
-    else
-    {
-      // Calculate the speed of the right motor
-      speeds.left_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF / 2 * -x);
-    }
+    speeds.right_speed = y * 255;
+    speeds.left_speed = speeds.right_speed * (1 + x);
 
     // Control the left motor
     control_left_motor_forward(speeds.left_speed);
@@ -329,18 +310,8 @@ MotorSpeeds detailed_direction_motor_control(float x, float y)
   else if (x < 0 && y < 0)
   {
     // Calculate the speed of the right motor
-    speeds.right_speed = MIN_SPEED + (difference_min_max * -y) + (MAX_SPEED_DIFF / 2 * -x);
-
-    if (speeds.right_speed > 255)
-    {
-      speeds.right_speed = 255;
-      speeds.left_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF * -x);
-    }
-    else
-    {
-      // Calculate the speed of the left motor
-      speeds.left_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF / 2 * -x);
-    }
+    speeds.right_speed = -y * 255;
+    speeds.left_speed = speeds.right_speed * (1 + x);
 
     // Control the left motor
     control_left_motor_backward(speeds.left_speed);
@@ -350,19 +321,8 @@ MotorSpeeds detailed_direction_motor_control(float x, float y)
   // If the joystick is in the bottom right corner -> Backward Right
   else if (x > 0 && y < 0)
   {
-    // Calculate the speed of the left motor
-    speeds.left_speed = MIN_SPEED + (difference_min_max * -y) + (MAX_SPEED_DIFF / 2 * x);
-
-    if (speeds.left_speed > 255)
-    {
-      speeds.left_speed = 255;
-      speeds.right_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF * x);
-    }
-    else
-    {
-      // Calculate the speed of the right motor
-      speeds.right_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF / 2 * x);
-    }
+    speeds.left_speed = -y * 255;
+    speeds.right_speed = speeds.left_speed * (1 - x);
 
     // Control the left motor
     control_left_motor_backward(speeds.left_speed);
@@ -372,27 +332,35 @@ MotorSpeeds detailed_direction_motor_control(float x, float y)
   else if (x == 0)
   {
     if (y > 0)
-    {
-      backward(255);
-    }
+      {backward(255);}
     else
-    {
-      forward(255);
-    }
+      {forward(255);}
+    speeds.left_speed = 255;speeds.right_speed = 255;
   }
   else if (y == 0)
   {
     if (x > 0)
-    {
-      right(255);
-    }
+      {right(255);speeds.left_speed = 255;speeds.right_speed = -255;}
     else
-    {
-      left(255);
-    }
+      {left(255);speeds.left_speed = -255;speeds.right_speed = 255;}
   }
 
   return speeds;
+}
+
+double map_Interval(double x) {
+    if (x < -1 || x > 1) {
+        // Input is out of bounds
+        return 0.0; // Or handle the error as you prefer
+    }
+
+    if (x <= 0) {
+        // Map [-1, 0] to [-1, -0.6]
+        return -1 + 0.4 * (x + 1);
+    } else {
+        // Map [0, 1] to [0.6, 1]
+        return 0.6 + 0.4 * x;
+    }
 }
 
 void forward(int speed)
@@ -408,12 +376,8 @@ void forward(int speed)
   analogWrite(enb, speed);
 }
 
-void right(int speed)
+void left(int speed)
 {
-  // MOTOR_A CLOCKWISE MAX SPEED
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  analogWrite(ena, speed);
 
   // MOTOR_B COUNTERCLOCKWISE MAX SPEED
   digitalWrite(in3, HIGH);
@@ -421,17 +385,12 @@ void right(int speed)
   analogWrite(enb, speed);
 }
 
-void left(int speed)
+void right(int speed)
 {
   // MOTOR_A COUNTERCLOCKWISE MAX SPEED
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);
   analogWrite(ena, speed);
-
-  // MOTOR_B CLOCKWISE MAX SPEED
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
-  analogWrite(enb, speed);
 }
 
 void backward(int speed)
