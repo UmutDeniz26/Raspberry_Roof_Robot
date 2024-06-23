@@ -33,26 +33,27 @@ class Common_Operations:
             raise ValueError("Error converting dictionary to string.")
 
     def client_to_arduino_wrapper( self, input_dict ) -> dict:
-        
-        if input_dict["Type"] == "robot_move":
-            return {
-                "Command": input_dict["Command"],
-                "Type": input_dict["Type"],
-                "X": input_dict["X"],
-                "Y": input_dict["Y"]
-            }
-        elif input_dict["Type"] == "camera_move":
-            return {
-                "Command": input_dict["Command"],
-                "Type": input_dict["Type"],
-                "axis": 1 if input_dict["axis"] > 0 else 0,
-                "direction": 1 if input_dict["direction"] > 0 else 0
-            }
-        elif input_dict["Type"] == "gps":
-            return {
-                "Command": input_dict["Command"],
-                "Type": input_dict["Type"]
-            }
+        try:
+            if input_dict["Type"] == "robot_move":
+                return {
+                    "Command": input_dict["Command"],
+                    "Type": input_dict["Type"],
+                    "X": input_dict["X"],
+                    "Y": input_dict["Y"]
+                }
+            elif input_dict["Type"] == "camera_move":
+                return {
+                    "Type": input_dict["Type"],
+                    "axis": 1 if input_dict["axis"] > 0 else 0,
+                    "direction": 1 if input_dict["direction"] > 0 else 0
+                }
+            elif input_dict["Type"] == "gps":
+                return {
+                    "Command": input_dict["Command"],
+                    "Type": input_dict["Type"]
+                }
+        except:
+            print("Error in client_to_arduino_wrapper: ", input_dict)
     
 
 class Serial_Port_Operations(Common_Operations):
@@ -312,7 +313,16 @@ class Raspberry_Server( Common_Operations ):
                         max_distance = get_max_distance( 'Modules/Distance_Sensor/VL53L3CX_rasppi/vl53l3cx_ranging_output.txt' )
                         print("Max distance is ", max_distance)
                             
-                        
+                        try:
+                            if max_distance > 150 :
+                                if "robot_move" in received_data:
+                                    # if the Y value is greater than 0, the robot rejects the command
+                                    if self.str_to_json_dict(received_data)["Y"] > 0:
+                                        print("The robot is not allowed to move forward.")
+                                        continue 
+                        except:
+                            pass    
+
                         if not hasattr(self.serial_port_operations, 'ser'):
                             print("Serial port is not available, skipping the transmission.")
                             continue
