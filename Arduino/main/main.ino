@@ -54,12 +54,16 @@ void stop();
 CameraPosition camera_control(int axis, int direction, int horizontal_position, int vertical_position);
 
 //Others
-double map_Interval(double x);
 
 struct MotorSpeeds
 {
   int left_speed;
   int right_speed;
+};
+
+struct MotorCoefs{
+  double X;
+  double Y;
 };
 
 void control_left_motor_forward(int speed);
@@ -127,13 +131,18 @@ void loop()
       {
         // Get the speed, x and y values
 
-        float x = doc["X"];
         float y = doc["Y"];
+        float x = doc["X"];
+
+        if (x > 1 || x < -1 || y > 1 || y < -1){
+          x = 0;
+          y = 0;
+        }
 
         // Map the y value
-        y = map_Interval(y);
+        MotorCoefs coefs = map_interval_coeffs(MotorCoefs{x, y});
 
-        speed_output = detailed_direction_motor_control(x, y);
+        speed_output = detailed_direction_motor_control(coefs.X, coefs.Y);
 
         return_output = "{\"X\": " + String(x) + ", \"Y\": " + String(y) + ", \"Left Speed\": " + String(speed_output.left_speed) + ", \"Right Speed\": " + String(speed_output.right_speed) + "}";
         hold_last_movement = currentTime;
@@ -202,8 +211,7 @@ CameraPosition camera_control(int axis, int direction, CameraPosition camera_pos
     }
 
     // Horizontal
-    setServoAngle(horizontal_position, servoHorizontalPin);
-    delay(50); // Small delay to allow the servo to move
+    smooth_servo_control(camera_position.horizontal_position, horizontal_position, servoHorizontalPin);
 
   }
   else if (axis == 1)
@@ -223,13 +231,26 @@ CameraPosition camera_control(int axis, int direction, CameraPosition camera_pos
     }
 
     // Vertical
-    setServoAngle(vertical_position, servoVerticalPin);
-    delay(50); // Small delay to allow the servo to move
+    smooth_servo_control(camera_position.vertical_position, vertical_position, servoVerticalPin);
   }
   updated_camera_position.horizontal_position = horizontal_position;
   updated_camera_position.vertical_position = vertical_position;
   return updated_camera_position;
 }
+void smooth_servo_control(int current_angle, int target_angle, int servoPin){
+  int step = 1;
+  if (current_angle < target_angle){
+    for (int i = current_angle; i < target_angle; i+=step){
+      setServoAngle(i, servoPin);
+    }
+  }
+  else if (current_angle > target_angle){
+    for (int i = current_angle; i > target_angle; i-=step){
+      setServoAngle(i, servoPin);
+    }
+  }
+}
+
 
 // Function to set the angle of the servo
 void setServoAngle(int angle, int servoPin){
@@ -240,7 +261,7 @@ void setServoAngle(int angle, int servoPin){
   delayMicroseconds(pulseWidth);
   digitalWrite(servoPin, LOW);
   // Wait for the servo to move to the desired position
-  delay(20); // Adjust this delay as needed
+  delay(50); // Adjust this delay as needed
 
 }
 
@@ -322,19 +343,27 @@ MotorSpeeds detailed_direction_motor_control(float x, float y)
   return speeds;
 }
 
-double map_Interval(double x) {
-    if (x < -1 || x > 1) {
-        // Input is out of bounds
-        return 0.0; // Or handle the error as you prefer
-    }
+MotorCoefs map_interval_coeffs(MotorCoefs coefs){
 
-    if (x <= 0) {
-        // Map [-1, 0] to [-1, -0.6]
-        return -1 + 0.4 * (x + 1);
-    } else {
-        // Map [0, 1] to [0.6, 1]
-        return 0.6 + 0.4 * x;
-    }
+  if (coefs.Y<0.1 && coefs.Y > -0.1){
+    coefs.Y = 0;
+  }
+  else if (coefs.Y > 0.6){
+    coefs.Y = 1.0;
+  }
+  else if (coefs.Y > 0) {
+    coefs.Y = 0.7 + 0.3 * coefs.Y;
+  } 
+  else if (coefs.Y < -0.6){
+    coefs.Y = -1.0;
+  }
+  else {
+    coefs.Y = -0.7 + 0.3 * coefs.Y;
+  }
+
+  coefs.X = coefs.X * 0.4;
+  return coefs;
+  
 }
 
 
