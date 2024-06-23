@@ -1,3 +1,5 @@
+//OLD
+
 Write this command to start stream 
 rpicam-vid - -n -t 0 --inline -o - | cvlc stream:///dev/stdin --sout '#rtp{sdp=rtsp://:8080/stream1}' :demux=h264
 
@@ -14,3 +16,10 @@ To get stream
     (To get the Ip adress, write hostname -I to terminal)
 
 4 - Play Stream
+
+//UPDATED
+
+1 - Run Modules/camera_stream.
+
+2 - Enter Stream URL: In form of "http://192.168.1.13:8080/video_feed"
+    (To get the Ip adress, write hostname -I to terminal)
