@@ -1,12 +1,20 @@
-{"Count": 5, "#Objs": 0, "Objects": []}
-{"Count": 6, "#Objs": 0, "Objects": []}
-{"Count": 7, "#Objs": 0, "Objects": []}
-{"Count": 8, "#Objs": 0, "Objects": []}
-{"Count": 9, "#Objs": 0, "Objects": []}
-{"Count": 10, "#Objs": 0, "Objects": []}
-{"Count": 11, "#Objs": 0, "Objects": []}
-{"Count": 12, "#Objs": 0, "Objects": []}
-{"Count": 13, "#Objs": 0, "Objects": []}
-{"Count": 14, "#Objs": 0, "Objects": []}
-{"Count": 15, "#Objs": 0, "Objects": []}
-{"Count": 16, "#Objs": 0, "Objects": []}
+{"Count": 201, "#Objs": 0, "Objects": []}
+{"Count": 202, "#Objs": 4, "Objects": [{"status": 12, "D": -147, "S": 923648, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 12, "D": 623, "S": 1011200, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 12, "D": 1394, "S": 1011200, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 4, "D": 2165, "S": 1011200, "Signal": 0.07, "Ambient": 0.05}]}
+{"Count": 203, "#Objs": 0, "Objects": []}
+{"Count": 204, "#Objs": 4, "Objects": [{"status": 12, "D": -147, "S": 923648, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 12, "D": 623, "S": 1011200, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 12, "D": 1394, "S": 1011200, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 4, "D": 2165, "S": 1011200, "Signal": 0.07, "Ambient": 0.05}]}
+{"Count": 205, "#Objs": 0, "Objects": []}
+{"Count": 206, "#Objs": 4, "Objects": [{"status": 12, "D": -147, "S": 923648, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 12, "D": 623, "S": 1011200, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 12, "D": 1394, "S": 1011200, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 4, "D": 2165, "S": 1011200, "Signal": 0.07, "Ambient": 0.05}]}
+{"Count": 207, "#Objs": 0, "Objects": []}
+{"Count": 208, "#Objs": 4, "Objects": [{"status": 12, "D": -147, "S": 923648, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 12, "D": 623, "S": 1011200, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 12, "D": 1394, "S": 1011200, "Signal": 0.07, "Ambient": 0.05},
+                     {"status": 4, "D": 2165, "S": 1011200, "Signal": 0.07, "Ambient": 0.05}]}

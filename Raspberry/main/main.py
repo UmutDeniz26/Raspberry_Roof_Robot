@@ -43,7 +43,6 @@ class Common_Operations:
                 }
             elif input_dict["Type"] == "camera_move":
                 return {
-                    "Command": input_dict["Command"],
                     "Type": input_dict["Type"],
                     "axis": 1 if input_dict["axis"] > 0 else 0,
                     "direction": 1 if input_dict["direction"] > 0 else 0
