@@ -315,7 +315,7 @@ class Raspberry_Server( Common_Operations ):
                         print("Max distance is ", max_distance)
                             
                         try:
-                            if max_distance > 150 or max_distance < 10:
+                            if max_distance > 150 :
                                 if "robot_move" in received_data:
                                     # if the Y value is greater than 0, the robot rejects the command
                                     if self.str_to_json_dict(received_data)["Y"] > 0:
