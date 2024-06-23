@@ -238,7 +238,7 @@ CameraPosition camera_control(int axis, int direction, CameraPosition camera_pos
   return updated_camera_position;
 }
 void smooth_servo_control(int current_angle, int target_angle, int servoPin){
-  int step = 1;
+  int step = 2;
   if (current_angle < target_angle){
     for (int i = current_angle; i < target_angle; i+=step){
       setServoAngle(i, servoPin);
