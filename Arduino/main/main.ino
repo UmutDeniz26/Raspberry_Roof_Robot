@@ -348,20 +348,29 @@ MotorCoefs map_interval_coeffs(MotorCoefs coefs){
   if (coefs.Y<0.1 && coefs.Y > -0.1){
     coefs.Y = 0;
   }
-  else if (coefs.Y > 0.6){
+  else if (coefs.Y > 0.7){
     coefs.Y = 1.0;
   }
   else if (coefs.Y > 0) {
     coefs.Y = 0.7 + 0.3 * coefs.Y;
   } 
-  else if (coefs.Y < -0.6){
+  else if (coefs.Y < -0.7){
     coefs.Y = -1.0;
   }
   else {
     coefs.Y = -0.7 + 0.3 * coefs.Y;
   }
 
-  coefs.X = coefs.X * 0.4;
+  if (coefs.X>0.8){
+    coefs.X = 1.0;
+  }
+  else if (coefs.X < -0.8){
+    coefs.X = -1.0;
+  }
+  else {
+    coefs.X = coefs.X * 0.4;
+  }
+  
   return coefs;
   
 }
