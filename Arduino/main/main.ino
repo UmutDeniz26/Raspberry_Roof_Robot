@@ -1,27 +1,35 @@
 #include <ArduinoJson.h>
 #include <SoftwareSerial.h>
-#include <Servo.h>
 
 unsigned long currentTime = 0;
 unsigned long hold_last_movement = 0;
+unsigned long hold_gps_measure_time = 0;
 
 // MOTOR Driver PINS
-const int ena = 4; // Motor A
-const int in1 = 6; // Controls direction of Motor A
+const int ena = 6; // Motor A
+const int in1 = 4; // Controls direction of Motor A
 const int in2 = 7; // Controls direction of Motor A
 
 const int enb = 10; // Motor B
 const int in3 = 8;  // Controls direction of Motor B
 const int in4 = 9;  // Controls direction of Motor B
 
-const unsigned long motor_time_out = 5000; // Interval for motor stop
+const unsigned long motor_time_out = 2000; // Interval for motor stop
 
 // Servo PINS
-const int servoHorizontalPin = 3;
+const int servoHorizontalPin = 11;
 const int servoVerticalPin = 5;
 
-Servo servoHorizontal;
-Servo servoVertical;
+
+struct CameraPosition {
+  int horizontal_position;
+  int vertical_position;
+};
+
+CameraPosition camera_position = {90, 90};
+
+const int minPulse = 6; // Minimum pulse width value
+const int maxPulse = 31; // Maximum pulse width value
 
 // Servo configuration
 int step_angle = 20;
@@ -31,9 +39,9 @@ int min_vertical_angle = 0;
 int max_vertical_angle = 180;
 
 // GPS configuration
-int RXPin = 11;
-int TXPin = 12;
-SoftwareSerial gpsSerial(RXPin, TXPin);
+//int RXPin = 2;
+//int TXPin = 3;
+//SoftwareSerial gpsSerial(RXPin, TXPin);
 
 // Function prototypes
 void forward(int speed);
@@ -41,7 +49,12 @@ void right(int speed);
 void left(int speed);
 void backward(int speed);
 void stop();
-void camera_control(int axis, int direction, int horizontal_position, int vertical_position);
+
+// Camera
+CameraPosition camera_control(int axis, int direction, int horizontal_position, int vertical_position);
+
+//Others
+double map_Interval(double x);
 
 struct MotorSpeeds
 {
@@ -49,8 +62,16 @@ struct MotorSpeeds
   int right_speed;
 };
 
+void control_left_motor_forward(int speed);
+void control_right_motor_forward(int speed);
+void control_left_motor_backward(int speed);
+void control_right_motor_backward(int speed);
 MotorSpeeds detailed_direction_motor_control(float x, float y);
-String readGPSData();
+
+//String readGPSData();
+const unsigned long gps_time_out = 10000;
+String GPS_data, data, return_output;
+MotorSpeeds speed_output;
 
 void setup()
 {
@@ -63,14 +84,21 @@ void setup()
   pinMode(in4, OUTPUT);
 
   // Set the servo pins as Output
-  servoHorizontal.attach(servoHorizontalPin);
-  servoVertical.attach(servoVerticalPin);
+  pinMode(servoHorizontalPin, OUTPUT);
+  pinMode(servoVerticalPin, OUTPUT);
 
-  gpsSerial.begin(9600);
+  // Set the servos to 90 degrees
+  setServoAngle(90, servoHorizontalPin);
+  setServoAngle(90, servoVerticalPin);
+
+  //gpsSerial.begin(9600);
   Serial.begin(19200);
+
+  // First GPS measure
+  GPS_data = "";
+
 }
 
-String GPS_data, data, return_output;
 
 void loop()
 {
@@ -102,9 +130,12 @@ void loop()
         float x = doc["X"];
         float y = doc["Y"];
 
-        MotorSpeeds speeds = detailed_direction_motor_control(x, y);
+        // Map the y value
+        y = map_Interval(y);
 
-        return_output = "{\"X\": " + String(x) + ", \"Y\": " + String(y) + ", \"Left Speed\": " + String(speeds.left_speed) + ", \"Right Speed\": " + String(speeds.right_speed) + "}";
+        speed_output = detailed_direction_motor_control(x, y);
+
+        return_output = "{\"X\": " + String(x) + ", \"Y\": " + String(y) + ", \"Left Speed\": " + String(speed_output.left_speed) + ", \"Right Speed\": " + String(speed_output.right_speed) + "}";
         hold_last_movement = currentTime;
       }
       else if (type == "camera_move")
@@ -113,15 +144,14 @@ void loop()
         int axis = doc["axis"];
         int direction = doc["direction"];
 
-        //
-        camera_control(axis, direction, servoHorizontal.read(), servoVertical.read());
+        // Set new camera position and return the new position
+        camera_position = camera_control(axis, direction, camera_position);
 
         return_output = "{\"axis\": " + String(axis) + ", \"direction\": " + String(direction) +
-                        ", \"horizontal_position\": " + String(servoHorizontal.read()) + ", \"vertical_position\": " + String(servoVertical.read()) + "}";
+        ", \"horizontal_position\": " + String(camera_position.horizontal_position) + ", \"vertical_position\": " + String(camera_position.vertical_position) + "}";
       }
       else if (type == "gps")
       {
-        GPS_data = readGPSData();
         return_output = "{\"gps\": " + GPS_data + "}";
       }
       // Add more commands here
@@ -141,10 +171,19 @@ void loop()
     hold_last_movement = currentTime;
     stop();
   }
+  else if (currentTime - hold_gps_measure_time >= gps_time_out)
+  {
+    hold_gps_measure_time = currentTime;
+    //GPS_data = readGPSData();
+  }
 }
 
-void camera_control(int axis, int direction, int horizontal_position, int vertical_position)
+CameraPosition camera_control(int axis, int direction, CameraPosition camera_position)
 {
+  CameraPosition updated_camera_position = {0, 0};
+  int horizontal_position = camera_position.horizontal_position;
+  int vertical_position = camera_position.vertical_position;
+
   // Move the camera
   if (axis == 0)
   {
@@ -153,12 +192,19 @@ void camera_control(int axis, int direction, int horizontal_position, int vertic
     {
       // Move left
       horizontal_position = horizontal_position - step_angle;
+      if (horizontal_position < min_horizontal_angle){return camera_position;}
     }
     else if (direction == 1)
     {
       // Move right
       horizontal_position = horizontal_position + step_angle;
+      if (horizontal_position > max_horizontal_angle){return camera_position;}
     }
+
+    // Horizontal
+    setServoAngle(horizontal_position, servoHorizontalPin);
+    delay(50); // Small delay to allow the servo to move
+
   }
   else if (axis == 1)
   {
@@ -167,27 +213,35 @@ void camera_control(int axis, int direction, int horizontal_position, int vertic
     {
       // Move up
       vertical_position = vertical_position - step_angle;
+      if (vertical_position < min_vertical_angle){return camera_position;}
     }
     else if (direction == 1)
     {
       // Move down
       vertical_position = vertical_position + step_angle;
+      if (vertical_position > max_vertical_angle){return camera_position;}
     }
-  }
 
-  // Move the servo to the target position
-  if (axis == 0)
-  {
-    // Horizontal
-    servoHorizontal.write(horizontal_position);
-    delay(500); // Small delay to allow the servo to move
-  }
-  else if (axis == 1)
-  {
     // Vertical
-    servoVertical.write(vertical_position);
-    delay(500); // Small delay to allow the servo to move
+    setServoAngle(vertical_position, servoVerticalPin);
+    delay(50); // Small delay to allow the servo to move
   }
+  updated_camera_position.horizontal_position = horizontal_position;
+  updated_camera_position.vertical_position = vertical_position;
+  return updated_camera_position;
+}
+
+// Function to set the angle of the servo
+void setServoAngle(int angle, int servoPin){
+  // Convert the angle to a pulse width between 500 and 2500 microseconds
+  int pulseWidth = map(angle, 0, 180, 500, 2500);
+  // Write the pulse width to the servo pin
+  digitalWrite(servoPin, HIGH);
+  delayMicroseconds(pulseWidth);
+  digitalWrite(servoPin, LOW);
+  // Wait for the servo to move to the desired position
+  delay(20); // Adjust this delay as needed
+
 }
 
 void stop()
@@ -199,116 +253,42 @@ void stop()
   digitalWrite(in4, LOW);
 }
 
-void control_left_motor_forward(int speed)
-{
-
-  // if speed larger than 255, set it to 255
-  speed = speed > 255 ? 255 : speed;
-  speed = speed < 0 ? 0 : speed;
-
-  // MOTOR_A COUNTERCLOCKWISE MAX SPEED
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
-  analogWrite(ena, speed);
-}
-
-void control_right_motor_forward(int speed)
-{
-
-  // if speed larger than 255, set it to 255
-  speed = speed > 255 ? 255 : speed;
-  speed = speed < 0 ? 0 : speed;
-
-  // MOTOR_B CLOCKWISE MAX SPEED
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
-  analogWrite(enb, speed);
-}
-
-void control_left_motor_backward(int speed)
-{
-
-  // if speed larger than 255, set it to 255
-  speed = speed > 255 ? 255 : speed;
-  speed = speed < 0 ? 0 : speed;
-
-  // MOTOR_A CLOCKWISE MAX SPEED
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  analogWrite(ena, speed);
-}
-
-void control_right_motor_backward(int speed)
-{
-
-  // if speed larger than 255, set it to 255
-  speed = speed > 255 ? 255 : speed;
-  speed = speed < 0 ? 0 : speed;
-
-  // MOTOR_B COUNTERCLOCKWISE MAX SPEED
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
-  analogWrite(enb, speed);
-}
 // Move the robot in a detailed direction
 MotorSpeeds detailed_direction_motor_control(float x, float y)
 {
   // X and Y are the coordinates of the joystick ( between -1 and 1 )
   // Speed is the speed of the motors ( between 0 and 255 )
   // The function will control the motors to move the robot in the direction of the joystick
-
-  int MIN_SPEED = 20;
-  int MAX_SPEED = 255;
-
-  int difference_min_max = MAX_SPEED - MIN_SPEED;
-
-  int MAX_SPEED_DIFF = difference_min_max * 1; // This coefficient can be adjusted to change the speed difference between the motors
-
   MotorSpeeds speeds = {0, 0};
 
   // If the joystick is in the middle, stop the robot
   if (x == 0 && y == 0)
   {
     stop();
+    speeds.left_speed = 0;
+    speeds.right_speed = 0;
   }
   // If the joystick is in the top right corner -> Forward Right
-  else if (x > 0 && y > 0)
+  else if (x >= 0 && y >= 0)
   {
     // Calculate the speed of the left motor
-    speeds.left_speed = MIN_SPEED + (difference_min_max * y) + (MAX_SPEED_DIFF / 2 * x);
+    speeds.left_speed = y * 255;
+    speeds.right_speed = speeds.left_speed * (1 - x) ;
 
-    if (speeds.left_speed > 255)
-    {
-      speeds.left_speed = 255;
-      speeds.right_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF * x);
-    }
-    else
-    {
-      // Calculate the speed of the right motor
-      speeds.right_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF / 2 * x);
-    }
 
     // Control the left motor
     control_left_motor_forward(speeds.left_speed);
+
     // Control the right motor
     control_right_motor_forward(speeds.right_speed);
+    
   }
   // If the joystick is in the top left corner -> Forward Left
-  else if (x < 0 && y > 0)
+  else if (x <= 0 && y >= 0)
   {
     // Calculate the speed of the left motor
-    speeds.right_speed = MIN_SPEED + (difference_min_max * y) + (MAX_SPEED_DIFF / 2 * -x);
-
-    if (speeds.right_speed > 255)
-    {
-      speeds.right_speed = 255;
-      speeds.left_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF * -x);
-    }
-    else
-    {
-      // Calculate the speed of the right motor
-      speeds.left_speed = MIN_SPEED + (difference_min_max * y) - (MAX_SPEED_DIFF / 2 * -x);
-    }
+    speeds.right_speed = y * 255;
+    speeds.left_speed = speeds.right_speed * (1 + x);
 
     // Control the left motor
     control_left_motor_forward(speeds.left_speed);
@@ -316,21 +296,11 @@ MotorSpeeds detailed_direction_motor_control(float x, float y)
     control_right_motor_forward(speeds.right_speed);
   }
   // If the joystick is in the bottom left corner -> Backward Left
-  else if (x < 0 && y < 0)
+  else if (x <= 0 && y <= 0)
   {
     // Calculate the speed of the right motor
-    speeds.right_speed = MIN_SPEED + (difference_min_max * -y) + (MAX_SPEED_DIFF / 2 * -x);
-
-    if (speeds.right_speed > 255)
-    {
-      speeds.right_speed = 255;
-      speeds.left_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF * -x);
-    }
-    else
-    {
-      // Calculate the speed of the left motor
-      speeds.left_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF / 2 * -x);
-    }
+    speeds.right_speed = -y * 255;
+    speeds.left_speed = speeds.right_speed * (1 + x);
 
     // Control the left motor
     control_left_motor_backward(speeds.left_speed);
@@ -338,105 +308,69 @@ MotorSpeeds detailed_direction_motor_control(float x, float y)
     control_right_motor_backward(speeds.right_speed);
   }
   // If the joystick is in the bottom right corner -> Backward Right
-  else if (x > 0 && y < 0)
+  else if (x >= 0 && y <= 0)
   {
-    // Calculate the speed of the left motor
-    speeds.left_speed = MIN_SPEED + (difference_min_max * -y) + (MAX_SPEED_DIFF / 2 * x);
-
-    if (speeds.left_speed > 255)
-    {
-      speeds.left_speed = 255;
-      speeds.right_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF * x);
-    }
-    else
-    {
-      // Calculate the speed of the right motor
-      speeds.right_speed = MIN_SPEED + (difference_min_max * -y) - (MAX_SPEED_DIFF / 2 * x);
-    }
+    speeds.left_speed = -y * 255;
+    speeds.right_speed = speeds.left_speed * (1 - x);
 
     // Control the left motor
     control_left_motor_backward(speeds.left_speed);
     // Control the right motor
     control_right_motor_backward(speeds.right_speed);
   }
-  else if (x == 0)
-  {
-    if (y > 0)
-    {
-      backward(255);
-    }
-    else
-    {
-      forward(255);
-    }
-  }
-  else if (y == 0)
-  {
-    if (x > 0)
-    {
-      right(255);
-    }
-    else
-    {
-      left(255);
-    }
-  }
 
   return speeds;
 }
 
-void forward(int speed)
-{
-  // MOTOR_A CLOCKWISE MAX SPEED
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  analogWrite(ena, speed);
+double map_Interval(double x) {
+    if (x < -1 || x > 1) {
+        // Input is out of bounds
+        return 0.0; // Or handle the error as you prefer
+    }
 
-  // MOTOR_B CLOCKWISE MAX SPEED
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
-  analogWrite(enb, speed);
+    if (x <= 0) {
+        // Map [-1, 0] to [-1, -0.6]
+        return -1 + 0.4 * (x + 1);
+    } else {
+        // Map [0, 1] to [0.6, 1]
+        return 0.6 + 0.4 * x;
+    }
 }
 
-void right(int speed)
-{
-  // MOTOR_A CLOCKWISE MAX SPEED
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  analogWrite(ena, speed);
 
-  // MOTOR_B COUNTERCLOCKWISE MAX SPEED
+void control_left_motor_forward(int speed)
+{
+  // MOTOR_A CLOCKWISE
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  analogWrite(ena, speed);
+}
+
+void control_right_motor_forward(int speed)
+{
+  // MOTOR_B CLOCKWISE
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
   analogWrite(enb, speed);
 }
 
-void left(int speed)
+void control_left_motor_backward(int speed)
 {
-  // MOTOR_A COUNTERCLOCKWISE MAX SPEED
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
+  // MOTOR_A Counter_CLOCKWISE
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
   analogWrite(ena, speed);
+}
 
-  // MOTOR_B CLOCKWISE MAX SPEED
+void control_right_motor_backward(int speed)
+{
+  // MOTOR_B COUNTERCLOCKWISE
   digitalWrite(in3, LOW);
   digitalWrite(in4, HIGH);
   analogWrite(enb, speed);
 }
 
-void backward(int speed)
-{
-  // MOTOR_A COUNTERCLOCKWISE MAX SPEED
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
-  analogWrite(ena, speed);
-
-  // MOTOR_B COUNTERCLOCKWISE MAX SPEED
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
-  analogWrite(enb, speed);
-}
-
+/*
 String readGPSData()
 {
   // Initialize variables
@@ -448,10 +382,16 @@ String readGPSData()
   // Read GPS data if available
   while (gpsSerial.available() > 0)
   {
+    // if Serial port is available interrupt the loop
+    if (Serial.available() > 0)
+    {
+      return GPS_data;
+    }
+    
     // Break if time exceeds max_serial_time
     if (millis() - start_time > max_serial_time)
     {
-      break;
+      return GPS_data;
     }
     c = gpsSerial.read();
     if (c == '\n')
@@ -467,7 +407,4 @@ String readGPSData()
 
   return gpsData;
 }
-/*
-Test request:
-{"Type": "robot_move", "Command": "forward"}
 */
