@@ -30,10 +30,3 @@ The Camera Side code sets up a Flask web server to stream video from a camera co
 3. Access the camera stream via the provided URL (`http://<Raspberry_Pi_IP>:<Port>/video_feed`).
 4. Send commands to the Raspberry Pi server to control the Arduino and receive responses.
 
-## Contributors
-- [Your Name]
-- [Your Name]
-
-## License
-This project is licensed under the [License Name] License - see the [LICENSE.md](LICENSE.md) file for details.
-
